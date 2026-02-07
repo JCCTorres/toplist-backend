@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import PropertyCard from '../features/home/components/PropertiesSection/PropertyCard';
 import { useApi } from '../hooks/useApi';
 import { api } from '../services/api';
@@ -6,7 +7,20 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 
 function Properties() {
-  const { data, loading, error, refetch } = useApi(() => api.getProperties());
+  const [searchParams] = useSearchParams();
+  const checkin = searchParams.get('checkin');
+  const checkout = searchParams.get('checkout');
+  const adults = searchParams.get('adults');
+  const children = searchParams.get('children');
+
+  const hasSearchParams = checkin && checkout;
+
+  const { data, loading, error, refetch } = useApi(
+    () => hasSearchParams
+      ? api.searchProperties({ startDate: checkin, endDate: checkout, numAdults: adults, numChildren: children })
+      : api.getProperties(),
+    [checkin, checkout, adults, children]
+  );
 
   if (loading) {
     return (
@@ -24,7 +38,9 @@ function Properties() {
     );
   }
 
-  const properties = data?.data?.properties || [];
+  const properties = hasSearchParams
+    ? data?.data?.results || []
+    : data?.data?.properties || [];
 
   return (
     <div className="bg-gray-100 min-h-screen pt-20">
@@ -32,11 +48,21 @@ function Properties() {
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-4xl font-bold text-center text-gray-800 mb-4">
-            All Properties
+            {hasSearchParams ? 'Available Properties' : 'All Properties'}
           </h1>
           <p className="text-lg text-gray-600 text-center max-w-2xl mx-auto">
-            Discover our complete collection of premium vacation rental properties in Orlando's most sought-after resorts.
+            {hasSearchParams
+              ? `Showing properties available from ${checkin} to ${checkout} for ${adults} adult${adults !== '1' ? 's' : ''}${children && children !== '0' ? ` and ${children} child${children !== '1' ? 'ren' : ''}` : ''}.`
+              : 'Discover our complete collection of premium vacation rental properties in Orlando\'s most sought-after resorts.'
+            }
           </p>
+          {hasSearchParams && (
+            <div className="text-center mt-4">
+              <Link to="/homes" className="text-pink-500 hover:text-pink-600 underline">
+                Clear search and show all properties
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -51,6 +77,27 @@ function Properties() {
             </div>
           ))}
         </div>
+
+        {/* Empty State */}
+        {properties.length === 0 && !loading && !error && (
+          <div className="text-center py-12">
+            <div className="bg-gray-50 rounded-lg p-8 max-w-lg mx-auto">
+              <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Properties Available</h3>
+              <p className="text-gray-600 mb-4">
+                {hasSearchParams
+                  ? 'No properties are available for your selected dates. Try different dates or contact us for assistance.'
+                  : 'No properties found. Please check back later.'
+                }
+              </p>
+              <Link to="/contact" className="text-pink-500 hover:text-pink-600 underline">
+                Contact us for help
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Additional Info Section */}
