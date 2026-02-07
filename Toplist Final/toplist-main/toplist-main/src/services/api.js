@@ -47,7 +47,7 @@ export const api = {
    * @returns {Promise<{success: boolean, data: Object}>}
    */
   getPropertyDetails: async (id) => {
-    const response = await fetch(`${BASE_URL}/property/${id}`);
+    const response = await fetch(`${BASE_URL}/properties/${id}/details`);
     return handleResponse(response);
   },
 
@@ -57,7 +57,7 @@ export const api = {
    * @returns {Promise<{success: boolean, data: Object}>}
    */
   getPropertyAvailability: async (id) => {
-    const response = await fetch(`${BASE_URL}/property/${id}/availability`);
+    const response = await fetch(`${BASE_URL}/properties/${id}/real-availability`);
     return handleResponse(response);
   },
 };
