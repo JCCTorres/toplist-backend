@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 1 of 3 (API Connection & Data Wiring)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-02-07 — Roadmap created
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-07 - Completed 01-01-PLAN.md (API client infrastructure)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [#####-----] 50% (Phase 1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: ~5 minutes
+- Total execution time: ~5 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 1/2 | ~5 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: -
+- Last 5 plans: 01-01 (~5 min)
+- Trend: Starting
 
 *Updated after each plan completion*
 
@@ -44,6 +44,9 @@ Recent decisions affecting current work:
 
 - [Roadmap]: Quick depth (3 phases) to ship today
 - [Roadmap]: Same-origin serving (Laravel serves React build) to avoid CORS
+- [01-01]: Native fetch over axios/react-query
+- [01-01]: Simple spinner over skeleton cards
+- [01-01]: Conditional field rendering for API data
 
 ### Pending Todos
 
@@ -59,5 +62,5 @@ From research/SUMMARY.md:
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Roadmap created, ready to plan Phase 1
-Resume file: None
+Stopped at: Completed 01-01-PLAN.md, ready for 01-02-PLAN.md
+Resume file: .planning/phases/01-api-connection-data-wiring/01-02-PLAN.md
