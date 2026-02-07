@@ -61,10 +61,19 @@ function PropertyDetails() {
     return 0;
   };
 
-  // Build photos array from API data
+  // Log availability errors for debugging (graceful degradation - no UI error)
+  useEffect(() => {
+    if (availability.error) {
+      console.warn('Availability fetch failed:', availability.error);
+      // Calendar continues to work without blocked dates
+    }
+  }, [availability.error]);
+
+  // Build photos array from API data with fallback
+  const PLACEHOLDER_IMAGE = '/images/properties/property-placeholder.jpg';
   const propertyImages = property?.photos?.length > 0
     ? property.photos
-    : (property?.main_image ? [property.main_image] : []);
+    : (property?.main_image ? [property.main_image] : [PLACEHOLDER_IMAGE]);
 
   // Handle ESC key press to close modal
   useEffect(() => {
