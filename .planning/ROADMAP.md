@@ -10,7 +10,7 @@ This brownfield project is ~80% complete with Laravel backend and React frontend
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: API Connection & Data Wiring** - Connect React frontend to Bookerville API via Laravel backend
+- [x] **Phase 1: API Connection & Data Wiring** - Connect React frontend to Bookerville API via Laravel backend *(Completed 2026-02-07)*
 - [ ] **Phase 2: Search, Availability & Booking Flow** - Wire date search, availability filtering, and Airbnb checkout
 - [ ] **Phase 3: Design Polish & Deployment** - Finalize design, secure environment, deploy to production
 
@@ -28,8 +28,8 @@ This brownfield project is ~80% complete with Laravel backend and React frontend
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Create API client and connect property listings to Bookerville
-- [ ] 01-02: Connect property detail pages with availability calendar and error handling
+- [x] 01-01: Create API client and connect property listings to Bookerville
+- [x] 01-02: Connect property detail pages with availability calendar and error handling
 
 ### Phase 2: Search, Availability & Booking Flow
 **Goal**: Users can search by dates, filter results, and complete booking via Airbnb redirect
@@ -70,7 +70,7 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. API Connection & Data Wiring | 0/2 | Not started | - |
+| 1. API Connection & Data Wiring | 2/2 | ✓ Complete | 2026-02-07 |
 | 2. Search, Availability & Booking Flow | 0/2 | Not started | - |
 | 3. Design Polish & Deployment | 0/2 | Not started | - |
 
