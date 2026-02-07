@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Guests can browse available properties, check real-time availability via Bookerville, and seamlessly proceed to book through Airbnb
-**Current focus:** Phase 2 In Progress - Search and Availability Flow
+**Current focus:** Phase 2 Complete - Ready for Phase 3
 
 ## Current Position
 
 Phase: 2 of 3 (Search, Availability & Booking Flow)
-Plan: 1 of 2 in current phase
-Status: In Progress
-Last activity: 2026-02-07 - Completed 02-01-PLAN.md (Search flow and properties filtering)
+Plan: 2 of 2 in current phase
+Status: Phase 2 Complete
+Last activity: 2026-02-07 - Completed 02-02-PLAN.md (Booking flow and email forms)
 
-Progress: [######....] 60% (3/5 plans)
+Progress: [########..] 80% (4/5 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: ~4 minutes
-- Total execution time: ~12 minutes
+- Total execution time: ~17 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 2/2 | ~9 min | ~4.5 min |
-| 02 | 1/2 | ~3 min | ~3 min |
+| 02 | 2/2 | ~8 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~5 min), 01-02 (~4 min), 02-01 (~3 min)
-- Trend: Improving
+- Last 5 plans: 01-01 (~5 min), 01-02 (~4 min), 02-01 (~3 min), 02-02 (~5 min)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -54,6 +54,10 @@ Recent decisions affecting current work:
 - [02-01]: URL params for search state (shareable links)
 - [02-01]: Conditional fetch based on URL presence
 - [02-01]: Children mapped from houseName field
+- [02-02]: Airbnb notice above Book Now for clear UX messaging
+- [02-02]: Separate Adults/Children selects instead of combined Total Guests
+- [02-02]: Contact fallback link for properties without airbnb_id
+- [02-02]: Optional message field added to management form
 
 ### Pending Todos
 
@@ -69,5 +73,5 @@ From research/SUMMARY.md:
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 02-01-PLAN.md (Search flow and properties filtering)
-Resume file: Ready for 02-02-PLAN.md (Property detail availability and booking)
+Stopped at: Completed Phase 2 (both plans 02-01 and 02-02)
+Resume file: Ready for Phase 3 planning
