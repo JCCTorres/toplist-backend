@@ -44,8 +44,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Wire search/filter functionality with availability checking
-- [ ] 02-02: Implement Airbnb checkout redirect and contact forms
+- [ ] 02-01-PLAN.md - Wire search bar to API and Properties page with search params
+- [ ] 02-02-PLAN.md - Wire Book Now to Airbnb redirect and connect email forms
 
 ### Phase 3: Design Polish & Deployment
 **Goal**: Production-ready site with professional design matching mastervacationhomes.com quality
