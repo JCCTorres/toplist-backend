@@ -79,4 +79,53 @@ export const api = {
     });
     return handleResponse(response);
   },
+
+  /**
+   * Generate Airbnb checkout URL with pre-filled dates/guests
+   * @param {string} airbnbId - Airbnb listing ID
+   * @param {Object} params - { checkin, checkout, numberOfAdults, numberOfChildren }
+   * @returns {Promise<{success: boolean, data: {checkout_url: string}}>}
+   */
+  getAirbnbCheckoutUrl: async (airbnbId, params) => {
+    const response = await fetch(`${BASE_URL}/airbnb/${airbnbId}/checkout-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        checkin: params.checkin,
+        checkout: params.checkout,
+        numberOfGuests: (parseInt(params.numberOfAdults) || 1) + (parseInt(params.numberOfChildren) || 0),
+        numberOfAdults: parseInt(params.numberOfAdults) || 1,
+        numberOfChildren: parseInt(params.numberOfChildren) || 0
+      })
+    });
+    return handleResponse(response);
+  },
+
+  /**
+   * Send contact form email
+   * @param {Object} data - { name, email, phone, message }
+   * @returns {Promise<{success: boolean, message: string}>}
+   */
+  sendContactEmail: async (data) => {
+    const response = await fetch('/api/email/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
+
+  /**
+   * Send management inquiry email
+   * @param {Object} data - { name, email, propertyType, bedrooms, message }
+   * @returns {Promise<{success: boolean, message: string}>}
+   */
+  sendManagementEmail: async (data) => {
+    const response = await fetch('/api/email/management-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
 };
