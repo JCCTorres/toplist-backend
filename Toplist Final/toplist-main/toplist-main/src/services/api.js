@@ -60,4 +60,23 @@ export const api = {
     const response = await fetch(`${BASE_URL}/properties/${id}/real-availability`);
     return handleResponse(response);
   },
+
+  /**
+   * Search properties by availability, dates, and guests
+   * @param {Object} params - { startDate, endDate, numAdults, numChildren }
+   * @returns {Promise<{success: boolean, data: {results: Array, total_results: number}}>}
+   */
+  searchProperties: async (params) => {
+    const response = await fetch(`${BASE_URL}/properties/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startDate: params.startDate,
+        endDate: params.endDate,
+        numAdults: parseInt(params.numAdults) || 1,
+        numChildren: parseInt(params.numChildren) || 0
+      })
+    });
+    return handleResponse(response);
+  },
 };
