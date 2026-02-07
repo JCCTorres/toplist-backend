@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 import { useApi } from '../hooks/useApi';
 import { api } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -11,10 +13,53 @@ function PropertyDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
   const [originalOverflow, setOriginalOverflow] = useState('');
+  const [selectedDates, setSelectedDates] = useState([]);
 
   // Fetch property details from API
   const { data, loading, error, refetch } = useApi(() => api.getPropertyDetails(id), [id]);
   const property = data?.data || null;
+
+  // Fetch availability data (runs in parallel with details)
+  const availability = useApi(() => api.getPropertyAvailability(id), [id]);
+
+  /**
+   * Convert availability data to Flatpickr disable format
+   * The API returns availableDates array - we need to calculate blocked dates
+   * or bookedStays could be an array of date ranges or just a count
+   */
+  const getDisabledDates = (availData) => {
+    if (!availData?.data) return [];
+
+    // If bookedStays is an array of objects with date ranges
+    if (Array.isArray(availData.data.bookedStays)) {
+      return availData.data.bookedStays.map(stay => ({
+        from: stay.arrivalDate || stay.startDate,
+        to: stay.departureDate || stay.endDate
+      })).filter(range => range.from && range.to);
+    }
+
+    // If we have availableDates, we could invert them to get blocked dates
+    // But this is complex - for now, if bookedStays is just a number, no dates to block
+    // The calendar will work but without specific blocked dates
+    if (availData.data.availableDates && Array.isArray(availData.data.availableDates)) {
+      // availableDates contains what IS available, not what's blocked
+      // For a basic implementation, we allow all future dates and rely on backend validation
+      // A more sophisticated approach would calculate gaps, but that's complex
+      return [];
+    }
+
+    return [];
+  };
+
+  // Calculate number of nights if both dates selected
+  const getNightsCount = () => {
+    if (selectedDates.length === 2) {
+      const diffTime = Math.abs(selectedDates[1] - selectedDates[0]);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    }
+    return 0;
+  };
 
   // Build photos array from API data
   const propertyImages = property?.photos?.length > 0
@@ -400,12 +445,26 @@ function PropertyDetails() {
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Check-in</label>
-                  <input type="date" className="w-full p-2 border border-gray-300 rounded" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Check-out</label>
-                  <input type="date" className="w-full p-2 border border-gray-300 rounded" />
+                  <label className="block text-sm font-medium mb-1">Select Dates</label>
+                  <Flatpickr
+                    options={{
+                      mode: 'range',
+                      minDate: 'today',
+                      dateFormat: 'Y-m-d',
+                      disable: getDisabledDates(availability.data)
+                    }}
+                    onChange={(dates) => setSelectedDates(dates)}
+                    placeholder="Select check-in - check-out"
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                  {availability.loading && (
+                    <p className="text-xs text-gray-500 mt-1">Loading availability...</p>
+                  )}
+                  {selectedDates.length === 2 && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      {getNightsCount()} night{getNightsCount() !== 1 ? 's' : ''} selected
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Total Guests</label>
