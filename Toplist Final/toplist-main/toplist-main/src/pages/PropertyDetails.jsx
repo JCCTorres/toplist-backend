@@ -14,6 +14,9 @@ function PropertyDetails() {
   const [modalImageIndex, setModalImageIndex] = useState(0);
   const [originalOverflow, setOriginalOverflow] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
+  const [guestCount, setGuestCount] = useState(2);
+  const [childrenCount, setChildrenCount] = useState(0);
+  const [bookingLoading, setBookingLoading] = useState(false);
 
   // Fetch property details from API
   const { data, loading, error, refetch } = useApi(() => api.getPropertyDetails(id), [id]);
@@ -59,6 +62,46 @@ function PropertyDetails() {
       return diffDays;
     }
     return 0;
+  };
+
+  // Format date for API
+  const formatDate = (date) => date.toISOString().split('T')[0];
+
+  // Handle Book Now button click
+  const handleBookNow = async () => {
+    // Check if property has Airbnb listing
+    if (!property.airbnb_id) {
+      alert('This property cannot be booked online. Please contact us to make a reservation.');
+      return;
+    }
+
+    // Validate dates selected
+    if (selectedDates.length !== 2) {
+      alert('Please select check-in and check-out dates before booking.');
+      return;
+    }
+
+    setBookingLoading(true);
+    try {
+      const response = await api.getAirbnbCheckoutUrl(property.airbnb_id, {
+        checkin: formatDate(selectedDates[0]),
+        checkout: formatDate(selectedDates[1]),
+        numberOfAdults: guestCount,
+        numberOfChildren: childrenCount
+      });
+
+      if (response.success && response.data?.checkout_url) {
+        // Open Airbnb in new tab
+        window.open(response.data.checkout_url, '_blank');
+      } else {
+        alert('Unable to generate booking link. Please try again or contact us.');
+      }
+    } catch (err) {
+      console.error('Booking error:', err);
+      alert('An error occurred. Please try again or contact us to book.');
+    } finally {
+      setBookingLoading(false);
+    }
   };
 
   // Log availability errors for debugging (graceful degradation - no UI error)
@@ -476,52 +519,67 @@ function PropertyDetails() {
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Total Guests</label>
-                  <select className="w-full p-2 border border-gray-300 rounded">
-                    {property.max_guests && [...Array(property.max_guests)].map((_, i) => (
-                      <option key={i + 1}>{i + 1} guest{i > 0 ? 's' : ''}</option>
-                    ))}
-                    {!property.max_guests && (
-                      <>
-                        <option>2 guests</option>
-                        <option>3 guests</option>
-                        <option>4 guests</option>
-                        <option>5 guests</option>
-                        <option>6 guests</option>
-                      </>
-                    )}
-                  </select>
-                </div>
-                <div>
                   <label className="block text-sm font-medium mb-1">Adults</label>
-                  <select className="w-full p-2 border border-gray-300 rounded">
-                    <option>2 adults</option>
-                    <option>3 adults</option>
-                    <option>4 adults</option>
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded"
+                    value={guestCount}
+                    onChange={(e) => setGuestCount(parseInt(e.target.value))}
+                  >
+                    <option value="1">1 adult</option>
+                    <option value="2">2 adults</option>
+                    <option value="3">3 adults</option>
+                    <option value="4">4 adults</option>
+                    <option value="5">5 adults</option>
+                    <option value="6">6 adults</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Children</label>
-                  <select className="w-full p-2 border border-gray-300 rounded">
-                    <option>0 children</option>
-                    <option>1 child</option>
-                    <option>2 children</option>
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded"
+                    value={childrenCount}
+                    onChange={(e) => setChildrenCount(parseInt(e.target.value))}
+                  >
+                    <option value="0">0 children</option>
+                    <option value="1">1 child</option>
+                    <option value="2">2 children</option>
+                    <option value="3">3 children</option>
+                    <option value="4">4 children</option>
                   </select>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">1</span>
-                </div>
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">2</span>
+              {/* Airbnb Redirect Notice */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-blue-700">
+                    <strong>Secure Booking:</strong> You will be redirected to Airbnb to complete your reservation securely.
+                  </p>
                 </div>
               </div>
 
-              <button className="w-full bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition-colors">
-                Book Now
-              </button>
+              {property.airbnb_id ? (
+                <button
+                  onClick={handleBookNow}
+                  disabled={bookingLoading}
+                  className="w-full bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {bookingLoading ? 'Preparing Booking...' : 'Book Now on Airbnb'}
+                </button>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-600 mb-3">This property requires direct booking.</p>
+                  <Link
+                    to="/contact"
+                    className="w-full block bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition-colors text-center"
+                  >
+                    Contact Us to Book
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
