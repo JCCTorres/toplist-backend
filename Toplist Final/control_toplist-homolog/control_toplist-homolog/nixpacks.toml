@@ -5,4 +5,4 @@ nixPkgs = ["php83", "php83Extensions.pdo_mysql", "php83Extensions.intl", "php83E
 cmds = ["mkdir -p /app/storage/framework/{sessions,views,cache} /app/storage/logs /app/bootstrap/cache", "composer install --optimize-autoloader --no-dev --no-interaction --no-scripts", "composer dump-autoload --optimize --no-scripts"]
 
 [start]
-cmd = "php artisan migrate --force --no-interaction 2>&1; php artisan config:cache --no-interaction 2>&1; php artisan route:cache --no-interaction 2>&1; php artisan serve --host=0.0.0.0 --port=${PORT:-8080} --no-interaction"
+cmd = "php artisan migrate --force --no-interaction 2>&1; php artisan bookerville:import toplist.properties.json --no-interaction 2>&1 || true; php artisan client-properties:import toplist.client_properties.json --no-interaction 2>&1 || true; php artisan config:cache --no-interaction 2>&1; php artisan route:cache --no-interaction 2>&1; php artisan serve --host=0.0.0.0 --port=${PORT:-8080} --no-interaction"
