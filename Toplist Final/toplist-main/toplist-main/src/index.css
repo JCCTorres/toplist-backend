@@ -156,6 +156,7 @@ section {
 }
 .card-img {
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(1.01);  /* Slight overflow to eliminate sub-pixel edge gaps */
 }
 
 /* ── Gold accent line ── */
