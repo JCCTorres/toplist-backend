@@ -28,7 +28,7 @@ export const api = {
    * @returns {Promise<{success: boolean, data: {properties: Array, count: number}}>}
    */
   getProperties: async () => {
-    const response = await fetch(`${BASE_URL}/all-properties`);
+    const response = await fetch(`${BASE_URL}/home-cards?limit=100`);
     return handleResponse(response);
   },
 

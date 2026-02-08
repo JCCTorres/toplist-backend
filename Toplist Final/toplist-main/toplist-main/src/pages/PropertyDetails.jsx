@@ -18,22 +18,29 @@ function PropertyDetails() {
   const [childrenCount, setChildrenCount] = useState(0);
   const [bookingLoading, setBookingLoading] = useState(false);
 
-  // Fetch property details from API
   const { data, loading, error, refetch } = useApi(() => api.getPropertyDetails(id), [id]);
-  const property = data?.data || null;
+  // API returns { success, data: { success, data: { id, name, details, ... } } }
+  const rawProperty = data?.data?.data || data?.data || null;
 
-  // Fetch availability data (runs in parallel with details)
+  // Flatten nested details into top-level for easier access
+  const property = rawProperty ? {
+    ...rawProperty,
+    title: rawProperty.title || rawProperty.name,
+    bedrooms: rawProperty.details?.bedrooms || rawProperty.bedrooms,
+    bathrooms: rawProperty.details?.bathrooms || rawProperty.bathrooms,
+    max_guests: rawProperty.details?.max_occupancy || rawProperty.max_guests,
+    category: rawProperty.details?.property_type || rawProperty.category,
+    city: rawProperty.address?.city || rawProperty.city,
+    state: rawProperty.address?.state || rawProperty.state,
+    amenities: Array.isArray(rawProperty.amenities) ? rawProperty.amenities : (rawProperty.amenities?.list || []),
+  } : null;
+
   const availability = useApi(() => api.getPropertyAvailability(id), [id]);
 
-  /**
-   * Convert availability data to Flatpickr disable format
-   * The API returns availableDates array - we need to calculate blocked dates
-   * or bookedStays could be an array of date ranges or just a count
-   */
   const getDisabledDates = (availData) => {
     if (!availData?.data) return [];
 
-    // If bookedStays is an array of objects with date ranges
+    // Handle bookedStays format
     if (Array.isArray(availData.data.bookedStays)) {
       return availData.data.bookedStays.map(stay => ({
         from: stay.arrivalDate || stay.startDate,
@@ -41,20 +48,23 @@ function PropertyDetails() {
       })).filter(range => range.from && range.to);
     }
 
-    // If we have availableDates, we could invert them to get blocked dates
-    // But this is complex - for now, if bookedStays is just a number, no dates to block
-    // The calendar will work but without specific blocked dates
+    // Handle availableDates format: dates NOT in this list are unavailable
     if (availData.data.availableDates && Array.isArray(availData.data.availableDates)) {
-      // availableDates contains what IS available, not what's blocked
-      // For a basic implementation, we allow all future dates and rely on backend validation
-      // A more sophisticated approach would calculate gaps, but that's complex
-      return [];
+      const availableSet = new Set();
+      availData.data.availableDates.forEach(d => {
+        availableSet.add(d.startDate || d.date);
+      });
+
+      // Build disabled date function for flatpickr
+      return function(date) {
+        const dateStr = date.toISOString().split('T')[0];
+        return !availableSet.has(dateStr);
+      };
     }
 
     return [];
   };
 
-  // Calculate number of nights if both dates selected
   const getNightsCount = () => {
     if (selectedDates.length === 2) {
       const diffTime = Math.abs(selectedDates[1] - selectedDates[0]);
@@ -64,18 +74,14 @@ function PropertyDetails() {
     return 0;
   };
 
-  // Format date for API
   const formatDate = (date) => date.toISOString().split('T')[0];
 
-  // Handle Book Now button click
   const handleBookNow = async () => {
-    // Check if property has Airbnb listing
     if (!property.airbnb_id) {
       alert('This property cannot be booked online. Please contact us to make a reservation.');
       return;
     }
 
-    // Validate dates selected
     if (selectedDates.length !== 2) {
       alert('Please select check-in and check-out dates before booking.');
       return;
@@ -91,7 +97,6 @@ function PropertyDetails() {
       });
 
       if (response.success && response.data?.checkout_url) {
-        // Open Airbnb in new tab
         window.open(response.data.checkout_url, '_blank');
       } else {
         alert('Unable to generate booking link. Please try again or contact us.');
@@ -104,21 +109,17 @@ function PropertyDetails() {
     }
   };
 
-  // Log availability errors for debugging (graceful degradation - no UI error)
   useEffect(() => {
     if (availability.error) {
       console.warn('Availability fetch failed:', availability.error);
-      // Calendar continues to work without blocked dates
     }
   }, [availability.error]);
 
-  // Build photos array from API data with fallback
   const PLACEHOLDER_IMAGE = '/images/properties/property-placeholder.jpg';
   const propertyImages = property?.photos?.length > 0
     ? property.photos
     : (property?.main_image ? [property.main_image] : [PLACEHOLDER_IMAGE]);
 
-  // Handle ESC key press to close modal
   useEffect(() => {
     const handleEscKey = (event) => {
       if (event.key === 'Escape' && isModalOpen) {
@@ -155,12 +156,12 @@ function PropertyDetails() {
     setOriginalOverflow(document.body.style.overflow || '');
     setModalImageIndex(index);
     setIsModalOpen(true);
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    document.body.style.overflow = originalOverflow; // Restore original overflow state
+    document.body.style.overflow = originalOverflow;
   };
 
   const nextModalImage = () => {
@@ -179,19 +180,17 @@ function PropertyDetails() {
     setModalImageIndex(index);
   };
 
-  // Loading state
   if (loading) {
     return (
-      <div className="pt-20 bg-dark-800 min-h-screen">
+      <div className="pt-20 bg-gray-50 min-h-screen">
         <LoadingSpinner />
       </div>
     );
   }
 
-  // Error state
   if (error || !property) {
     return (
-      <div className="pt-20 bg-dark-800 min-h-screen">
+      <div className="pt-20 bg-gray-50 min-h-screen">
         <ErrorMessage
           message={error || "Property not found"}
           onRetry={refetch}
@@ -199,7 +198,7 @@ function PropertyDetails() {
         <div className="flex justify-center mt-4">
           <Link
             to="/homes"
-            className="text-blue-400 hover:text-blue-300 underline"
+            className="text-blue-600 hover:text-blue-700 underline"
           >
             Back to Properties
           </Link>
@@ -208,8 +207,16 @@ function PropertyDetails() {
     );
   }
 
-  // Extract price from rates if available
   const getDisplayPrice = () => {
+    // rates is an array of rate periods with nightly_rate, weekend_rate, etc.
+    if (Array.isArray(property.rates) && property.rates.length > 0) {
+      // Find the first rate with a non-zero nightly_rate
+      const activeRate = property.rates.find(r => r.nightly_rate > 0);
+      if (activeRate) return `$${activeRate.nightly_rate}`;
+      // Fallback to weekend rate
+      const weekendRate = property.rates.find(r => r.weekend_rate > 0);
+      if (weekendRate) return `$${weekendRate.weekend_rate}`;
+    }
     if (property.rates?.nightly) {
       return `$${property.rates.nightly}`;
     }
@@ -219,7 +226,6 @@ function PropertyDetails() {
     return '$--';
   };
 
-  // Build location string
   const getLocationString = () => {
     const parts = [];
     if (property.city) parts.push(property.city);
@@ -228,8 +234,8 @@ function PropertyDetails() {
   };
 
   return (
-    <div className="pt-20 bg-dark-800 min-h-screen">
-      {/* Image Carousel - Full width below navbar */}
+    <div className="pt-20 bg-gray-50 min-h-screen">
+      {/* Image Carousel */}
       {propertyImages.length > 0 && (
         <div className="relative w-full h-[400px] overflow-hidden bg-gray-200">
           <img
@@ -239,7 +245,6 @@ function PropertyDetails() {
             onClick={() => openModal(currentImageIndex)}
           />
 
-          {/* Navigation Arrows - only show if multiple images */}
           {propertyImages.length > 1 && (
             <>
               <button
@@ -262,7 +267,6 @@ function PropertyDetails() {
             </>
           )}
 
-          {/* Image Indicators */}
           {propertyImages.length > 1 && (
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
               {propertyImages.map((_, index) => (
@@ -287,7 +291,6 @@ function PropertyDetails() {
           className="fixed inset-0 bg-black bg-opacity-90 z-[9998] flex items-center justify-center"
           onClick={closeModal}
         >
-          {/* Close Button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -301,7 +304,6 @@ function PropertyDetails() {
             </svg>
           </button>
 
-          {/* Main Modal Image */}
           <div
             className="relative w-full h-full flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
@@ -312,7 +314,6 @@ function PropertyDetails() {
               className="max-w-[90%] max-h-[80%] object-contain"
             />
 
-            {/* Modal Navigation Arrows */}
             {propertyImages.length > 1 && (
               <>
                 <button
@@ -342,7 +343,6 @@ function PropertyDetails() {
             )}
           </div>
 
-          {/* Bottom Thumbnail Strip */}
           {propertyImages.length > 1 && (
             <div
               className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-white bg-opacity-10 rounded-lg p-3"
@@ -371,7 +371,6 @@ function PropertyDetails() {
             </div>
           )}
 
-          {/* Image Counter */}
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm font-medium">
             {modalImageIndex + 1} / {propertyImages.length}
           </div>
@@ -384,44 +383,40 @@ function PropertyDetails() {
 
           {/* Left Column - Property Info */}
           <div className="lg:col-span-2">
-            {/* Property Title and Details */}
             <div className="mb-6">
               <div className="flex items-center mb-2">
                 <span className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">{getDisplayPrice()}/night</span>
               </div>
-              <p className="text-sm text-gray-400 mb-1">
+              <p className="text-sm text-gray-500 mb-1">
                 {property.bedrooms && `${property.bedrooms} Bedrooms`}
                 {property.bathrooms && ` | ${property.bathrooms} Bathrooms`}
                 {property.max_guests && ` | ${property.max_guests} Guests`}
                 {property.category && ` | ${property.category}`}
               </p>
-              <h1 className="font-heading text-2xl font-bold text-white mb-4">
+              <h1 className="font-heading text-2xl font-bold text-navy-900 mb-4">
                 {property.title}
                 {getLocationString() && ` - ${getLocationString()}`}
               </h1>
               {property.description && (
-                <p className="text-gray-400 text-sm leading-relaxed">
+                <p className="text-gray-600 text-sm leading-relaxed">
                   {property.description}
                 </p>
-              )}
-              {property.description && (
-                <button className="text-blue-400 text-sm font-medium mt-2 hover:text-blue-300">Read More</button>
               )}
             </div>
 
             {/* Dynamic Amenities Grid */}
             {property.amenities && property.amenities.length > 0 && (
               <div className="mb-8">
-                <h2 className="font-heading text-xl font-semibold mb-4 text-white">Amenities</h2>
+                <h2 className="font-heading text-xl font-semibold mb-4 text-navy-900">Amenities</h2>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
                   {property.amenities.map((amenity, index) => (
-                    <div key={index} className="flex flex-col items-center p-3 bg-dark-700 border border-dark-600 rounded-lg">
+                    <div key={index} className="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
                       <div className="w-8 h-8 mb-2 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41-1.41L9,16.17z"/>
                         </svg>
                       </div>
-                      <span className="text-xs text-center text-gray-300">{amenity}</span>
+                      <span className="text-xs text-center text-gray-600">{amenity}</span>
                     </div>
                   ))}
                 </div>
@@ -430,9 +425,9 @@ function PropertyDetails() {
 
             {/* Guest Reviews */}
             <div>
-              <h2 className="font-heading text-xl font-semibold mb-4 text-white">Guest Reviews</h2>
+              <h2 className="font-heading text-xl font-semibold mb-4 text-navy-900">Guest Reviews</h2>
               <div className="flex items-center mb-4">
-                <span className="text-2xl font-bold mr-2 text-white">5.0</span>
+                <span className="text-2xl font-bold mr-2 text-navy-900">5.0</span>
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -444,12 +439,12 @@ function PropertyDetails() {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3 bg-dark-700 p-4 rounded-lg">
+                <div className="flex items-start space-x-3 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-sm font-medium">A</span>
                   </div>
                   <div>
-                    <p className="font-medium text-white">Anonymous Guest</p>
+                    <p className="font-medium text-navy-900">Anonymous Guest</p>
                     <div className="flex text-yellow-400 text-sm">
                       {[...Array(5)].map((_, i) => (
                         <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -460,12 +455,12 @@ function PropertyDetails() {
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-dark-700 p-4 rounded-lg">
+                <div className="flex items-start space-x-3 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-sm font-medium">A</span>
                   </div>
                   <div>
-                    <p className="font-medium text-white">Anonymous Guest</p>
+                    <p className="font-medium text-navy-900">Anonymous Guest</p>
                     <div className="flex text-yellow-400 text-sm">
                       {[...Array(5)].map((_, i) => (
                         <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -481,23 +476,23 @@ function PropertyDetails() {
 
           {/* Right Column - Booking Info */}
           <div className="lg:col-span-1">
-            <div className="bg-dark-700 border border-dark-600 rounded-lg p-6 sticky top-24">
-              <h3 className="font-heading text-lg font-semibold mb-4 text-white">Booking Information</h3>
+            <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-24 shadow-md">
+              <h3 className="font-heading text-lg font-semibold mb-4 text-navy-900">Booking Information</h3>
 
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-gray-300">Base Price:</span>
-                  <span className="text-white">{getDisplayPrice()}/night</span>
+                  <span className="font-medium text-gray-500">Base Price:</span>
+                  <span className="text-navy-900">{getDisplayPrice()}/night</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-300">Total per night:</span>
-                  <span className="font-bold text-white">{getDisplayPrice()}</span>
+                  <span className="font-medium text-gray-500">Total per night:</span>
+                  <span className="font-bold text-navy-900">{getDisplayPrice()}</span>
                 </div>
               </div>
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-300">Select Dates</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Select Dates</label>
                   <Flatpickr
                     options={{
                       mode: 'range',
@@ -507,21 +502,21 @@ function PropertyDetails() {
                     }}
                     onChange={(dates) => setSelectedDates(dates)}
                     placeholder="Select check-in - check-out"
-                    className="w-full p-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {availability.loading && (
-                    <p className="text-xs text-gray-500 mt-1">Loading availability...</p>
+                    <p className="text-xs text-gray-400 mt-1">Loading availability...</p>
                   )}
                   {selectedDates.length === 2 && (
-                    <p className="text-sm text-gray-400 mt-2">
+                    <p className="text-sm text-gray-500 mt-2">
                       {getNightsCount()} night{getNightsCount() !== 1 ? 's' : ''} selected
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-300">Adults</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Adults</label>
                   <select
-                    className="w-full p-3 bg-dark-800 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={guestCount}
                     onChange={(e) => setGuestCount(parseInt(e.target.value))}
                   >
@@ -534,9 +529,9 @@ function PropertyDetails() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-300">Children</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Children</label>
                   <select
-                    className="w-full p-3 bg-dark-800 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={childrenCount}
                     onChange={(e) => setChildrenCount(parseInt(e.target.value))}
                   >
@@ -550,12 +545,12 @@ function PropertyDetails() {
               </div>
 
               {/* Airbnb Redirect Notice */}
-              <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <div className="flex items-start">
-                  <svg className="w-5 h-5 text-blue-400 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-blue-300">
+                  <p className="text-sm text-blue-700">
                     <strong>Secure Booking:</strong> You will be redirected to Airbnb to complete your reservation securely.
                   </p>
                 </div>
@@ -565,16 +560,16 @@ function PropertyDetails() {
                 <button
                   onClick={handleBookNow}
                   disabled={bookingLoading}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {bookingLoading ? 'Preparing Booking...' : 'Book Now on Airbnb'}
                 </button>
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-400 mb-3">This property requires direct booking.</p>
+                  <p className="text-gray-500 mb-3">This property requires direct booking.</p>
                   <Link
                     to="/contact"
-                    className="w-full block bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center"
+                    className="w-full block bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center shadow-md"
                   >
                     Contact Us to Book
                   </Link>
