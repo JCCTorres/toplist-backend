@@ -99,6 +99,16 @@ class BookervilleController extends Controller
             $params = $validator->validated();
             $result = $this->bookervilleService->getPropertyDetails($params);
 
+            // Merge local airbnb_id into response if available
+            $localProp = Property::where('property_id', $propertyId)->first();
+            if ($localProp && $localProp->airbnb_id) {
+                if (is_array($result) && isset($result['data'])) {
+                    $result['data']['airbnb_id'] = (string) $localProp->airbnb_id;
+                } elseif (is_array($result)) {
+                    $result['airbnb_id'] = (string) $localProp->airbnb_id;
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $result
@@ -338,7 +348,8 @@ class BookervilleController extends Controller
                     'image' => $details['mainImage'] ?? $details['main_image'] ?? $property->main_image,
                     'category' => $property->category,
                     'city' => $details['city'] ?? '',
-                    'state' => $details['state'] ?? ''
+                    'state' => $details['state'] ?? '',
+                    'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : null,
                 ];
             };
 
