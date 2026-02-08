@@ -55,11 +55,11 @@ function PropertyDetails() {
         availableSet.add(d.startDate || d.date);
       });
 
-      // Build disabled date function for flatpickr
-      return function(date) {
+      // Flatpickr disable expects an array; a function must be wrapped in [fn]
+      return [function(date) {
         const dateStr = date.toISOString().split('T')[0];
         return !availableSet.has(dateStr);
-      };
+      }];
     }
 
     return [];
