@@ -24,7 +24,7 @@ function Properties() {
 
   if (loading) {
     return (
-      <div className="bg-sand-50 min-h-screen pt-20">
+      <div className="min-h-screen pt-20">
         <LoadingSpinner />
       </div>
     );
@@ -32,7 +32,7 @@ function Properties() {
 
   if (error) {
     return (
-      <div className="bg-sand-50 min-h-screen pt-20">
+      <div className="min-h-screen pt-20">
         <ErrorMessage onRetry={refetch} />
       </div>
     );
@@ -43,7 +43,7 @@ function Properties() {
     : [...(data?.data?.properties || []), ...(data?.data?.resorts || [])];
 
   return (
-    <div className="bg-sand-50 min-h-screen pt-20">
+    <div className="min-h-screen pt-20">
       {/* Header Section */}
       <div className="bg-navy-950">
         <div className="container mx-auto px-4 py-16">
@@ -80,7 +80,7 @@ function Properties() {
 
         {properties.length === 0 && !loading && !error && (
           <div className="text-center py-12">
-            <div className="bg-sand-50 border border-sand-200/60 rounded-2xl p-8 max-w-lg mx-auto shadow-sm">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 max-w-lg mx-auto shadow-sm">
               <svg className="w-16 h-16 text-navy-800/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

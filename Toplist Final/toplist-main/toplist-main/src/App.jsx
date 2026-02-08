@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import SimpleFooter from './components/SimpleFooter.jsx';
+import Starfield from './components/Starfield.jsx';
 import Home from './pages/Home.jsx';
 import Properties from './pages/Properties.jsx';
 import Services from './pages/Services.jsx';
@@ -19,9 +20,10 @@ function AppContent() {
   const isHome = location.pathname === '/';
 
   return (
-    <div className={isHome ? 'h-[100dvh] overflow-hidden' : 'flex flex-col min-h-screen'}>
+    <div className={isHome ? 'h-[100dvh] flex flex-col' : 'flex flex-col min-h-screen bg-navy-800'}>
+      {!isHome && <Starfield />}
       <Navbar />
-      <main className={isHome ? 'h-full' : 'flex-grow'}>
+      <main className={isHome ? 'flex-1 min-h-0' : 'flex-grow relative z-10'}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/homes" element={<Properties />} />
@@ -36,7 +38,7 @@ function AppContent() {
           <Route path="/property-details" element={<PropertyDetails />} />
         </Routes>
       </main>
-      {!isHome && <Footer />}
+      {isHome ? <SimpleFooter /> : <Footer />}
     </div>
   );
 }

@@ -77,11 +77,11 @@ function Services() {
       </div>
 
       {/* Services Cards */}
-      <div className="bg-sand-50 py-16">
+      <div className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, index) => (
-              <div key={index} className="bg-white border border-sand-200/60 rounded-2xl shadow-sm overflow-hidden card-hover transition-all duration-300">
+              <div key={index} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl shadow-sm overflow-hidden card-hover transition-all duration-300">
                 <div className="h-48 overflow-hidden">
                   {service.image.endsWith('.mp4') ? (
                     <video autoPlay muted loop playsInline className="w-full h-full object-cover">
@@ -92,14 +92,14 @@ function Services() {
                   )}
                 </div>
                 <div className="p-5">
-                  <h3 className="font-heading font-bold text-lg mb-2 text-navy-950">{service.title}</h3>
-                  <p className="text-navy-800/60 text-sm">{service.description}</p>
+                  <h3 className="font-heading font-bold text-lg mb-2 text-white">{service.title}</h3>
+                  <p className="text-sand-200/60 text-sm">{service.description}</p>
                 </div>
               </div>
             ))}
 
             <div
-              className="bg-sand-100 border border-sand-200/60 rounded-2xl overflow-hidden flex items-center justify-center cursor-pointer card-hover transition-all duration-300"
+              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center cursor-pointer card-hover transition-all duration-300 hover:bg-white/10"
               onClick={() => setShowMoreServices(true)}
             >
               <div className="text-center p-6">
@@ -108,8 +108,8 @@ function Services() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                 </div>
-                <h3 className="font-heading font-bold text-lg mb-2 text-navy-950">See More</h3>
-                <p className="text-navy-800/40 text-sm">View additional add-ons</p>
+                <h3 className="font-heading font-bold text-lg mb-2 text-white">See More</h3>
+                <p className="text-sand-200/40 text-sm">View additional add-ons</p>
               </div>
             </div>
           </div>
@@ -157,26 +157,26 @@ function Services() {
       )}
 
       {/* Service Request Form */}
-      <div className="bg-sand-50 py-16">
+      <div className="py-16">
         <div className="container mx-auto px-4 max-w-3xl">
-          <h2 className="font-heading text-2xl font-bold text-center text-navy-950 mb-8">Request an Add-on</h2>
-          <form onSubmit={handleSubmit} className="bg-white border border-sand-200/60 rounded-2xl p-8 shadow-sm">
+          <h2 className="font-heading text-2xl font-bold text-center text-white mb-8">Request an Add-on</h2>
+          <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-navy-800/60 mb-2 text-sm font-medium">Name</label>
-                <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-4 py-3 bg-white border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900" required />
+                <label htmlFor="name" className="block text-sand-200/60 mb-2 text-sm font-medium">Name</label>
+                <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white placeholder-white/30" required />
               </div>
               <div>
-                <label htmlFor="email" className="block text-navy-800/60 mb-2 text-sm font-medium">Email</label>
-                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-4 py-3 bg-white border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900" required />
+                <label htmlFor="email" className="block text-sand-200/60 mb-2 text-sm font-medium">Email</label>
+                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white placeholder-white/30" required />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-navy-800/60 mb-2 text-sm font-medium">Phone</label>
-                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-4 py-3 bg-white border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900" />
+                <label htmlFor="phone" className="block text-sand-200/60 mb-2 text-sm font-medium">Phone</label>
+                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white placeholder-white/30" />
               </div>
               <div>
-                <label htmlFor="serviceType" className="block text-navy-800/60 mb-2 text-sm font-medium">Add-on Type</label>
-                <select id="serviceType" name="serviceType" value={formData.serviceType} onChange={handleInputChange} className="w-full px-4 py-3 bg-white border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900" required>
+                <label htmlFor="serviceType" className="block text-sand-200/60 mb-2 text-sm font-medium">Add-on Type</label>
+                <select id="serviceType" name="serviceType" value={formData.serviceType} onChange={handleInputChange} className="w-full px-4 py-3 bg-navy-900 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white" required>
                   <option value="">Select an add-on</option>
                   <option value="bbq">BBQ</option>
                   <option value="pool">Pool Heating</option>
@@ -187,8 +187,8 @@ function Services() {
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label htmlFor="message" className="block text-navy-800/60 mb-2 text-sm font-medium">Message</label>
-                <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} rows="4" className="w-full px-4 py-3 bg-white border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900" required></textarea>
+                <label htmlFor="message" className="block text-sand-200/60 mb-2 text-sm font-medium">Message</label>
+                <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} rows="4" className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white placeholder-white/30" required></textarea>
               </div>
             </div>
             <div className="mt-6 text-center">

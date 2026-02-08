@@ -11,8 +11,8 @@ const PropertyCard = ({ property }) => {
   const hasStructuredDetails = property.bedrooms || property.bathrooms || property.max_guests;
 
   return (
-    <div className="card-hover bg-white rounded-2xl overflow-hidden flex flex-col h-full border border-sand-200/60 shadow-sm">
-      <div className="relative h-64 overflow-hidden bg-sand-100">
+    <div className="card-hover bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 shadow-sm">
+      <div className="relative h-64 overflow-hidden bg-navy-900">
         {image ? (
           <>
             <img src={image} alt={title} className="card-img w-full h-full object-cover" />
@@ -26,10 +26,10 @@ const PropertyCard = ({ property }) => {
         )}
       </div>
       <div className="p-6 flex flex-col flex-grow">
-        <h3 className="font-heading text-lg font-semibold text-navy-900 mb-2">{title}</h3>
+        <h3 className="font-heading text-lg font-semibold text-white mb-2">{title}</h3>
 
         {hasStructuredDetails ? (
-          <div className="flex items-center gap-4 text-navy-800/60 mb-3 text-sm">
+          <div className="flex items-center gap-4 text-sand-200/60 mb-3 text-sm">
             {property.bedrooms > 0 && (
               <span className="flex items-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
@@ -50,13 +50,13 @@ const PropertyCard = ({ property }) => {
             )}
           </div>
         ) : guestsStr && (
-          <div className="text-navy-800/60 mb-3 text-sm">
+          <div className="text-sand-200/60 mb-3 text-sm">
             {guestsStr}
           </div>
         )}
 
         {city && (
-          <div className="text-xs uppercase tracking-wider text-navy-800/40 mb-4 flex items-center gap-1.5">
+          <div className="text-xs uppercase tracking-wider text-sand-200/40 mb-4 flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             {city}
           </div>
@@ -65,7 +65,7 @@ const PropertyCard = ({ property }) => {
         <div className="mt-auto">
           <Link
             to={`/property-details/${property.id}`}
-            className="block w-full text-center bg-navy-900 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-navy-800 transition-colors"
+            className="block w-full text-center bg-gold-500/20 text-gold-400 border border-gold-500/30 py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-gold-500/30 transition-colors"
           >
             View Details
           </Link>

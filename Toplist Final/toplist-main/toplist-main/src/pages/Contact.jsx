@@ -12,30 +12,30 @@ function Contact() {
         </div>
       </div>
 
-      <div className="bg-sand-50 py-16">
+      <div className="py-16">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white border border-sand-200/60 p-8 rounded-2xl shadow-sm">
-              <h2 className="font-heading text-xl font-bold text-navy-950 mb-6">Send us a message</h2>
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-2xl">
+              <h2 className="font-heading text-xl font-bold text-white mb-6">Send us a message</h2>
               <form className="space-y-5">
                 <div>
-                  <label htmlFor="name" className="block mb-2 text-navy-800/60 text-xs font-medium uppercase tracking-wider">Name</label>
-                  <input type="text" id="name" className="w-full p-3 bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900" />
+                  <label htmlFor="name" className="block mb-2 text-sand-200/60 text-xs font-medium uppercase tracking-wider">Name</label>
+                  <input type="text" id="name" className="w-full p-3 bg-white/10 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white placeholder-white/30" />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block mb-2 text-navy-800/60 text-xs font-medium uppercase tracking-wider">Email</label>
-                  <input type="email" id="email" className="w-full p-3 bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900" />
+                  <label htmlFor="email" className="block mb-2 text-sand-200/60 text-xs font-medium uppercase tracking-wider">Email</label>
+                  <input type="email" id="email" className="w-full p-3 bg-white/10 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white placeholder-white/30" />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block mb-2 text-navy-800/60 text-xs font-medium uppercase tracking-wider">Message</label>
-                  <textarea id="message" rows="4" className="w-full p-3 bg-sand-50 border border-sand-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-navy-900"></textarea>
+                  <label htmlFor="message" className="block mb-2 text-sand-200/60 text-xs font-medium uppercase tracking-wider">Message</label>
+                  <textarea id="message" rows="4" className="w-full p-3 bg-white/10 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 text-white placeholder-white/30"></textarea>
                 </div>
                 <button type="submit" className="w-full bg-gold-500 text-navy-950 px-6 py-3 rounded-xl font-semibold hover:bg-gold-400 transition-colors shadow-md">Submit</button>
               </form>
             </div>
             <div className="flex flex-col justify-center">
-              <div className="bg-white border border-sand-200/60 p-8 rounded-2xl shadow-sm">
-                <h2 className="font-heading text-xl font-bold mb-6 text-navy-950">Our Information</h2>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-2xl">
+                <h2 className="font-heading text-xl font-bold mb-6 text-white">Our Information</h2>
                 <div className="space-y-5">
                   <div className="flex items-start">
                     <div className="bg-gold-500/10 p-2.5 rounded-lg mr-4 flex-shrink-0">
@@ -45,8 +45,8 @@ function Contact() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-navy-800/40 text-xs font-medium uppercase tracking-wider">Address</p>
-                      <p className="text-navy-900 mt-1">123 Tourism Ave, Orlando, FL</p>
+                      <p className="text-sand-200/40 text-xs font-medium uppercase tracking-wider">Address</p>
+                      <p className="text-white mt-1">123 Tourism Ave, Orlando, FL</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -56,8 +56,8 @@ function Contact() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-navy-800/40 text-xs font-medium uppercase tracking-wider">Phone</p>
-                      <p className="text-navy-900 mt-1">(123) 456-7890</p>
+                      <p className="text-sand-200/40 text-xs font-medium uppercase tracking-wider">Phone</p>
+                      <p className="text-white mt-1">(123) 456-7890</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -67,8 +67,8 @@ function Contact() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-navy-800/40 text-xs font-medium uppercase tracking-wider">Email</p>
-                      <p className="text-navy-900 mt-1">info@toplistorlando.com</p>
+                      <p className="text-sand-200/40 text-xs font-medium uppercase tracking-wider">Email</p>
+                      <p className="text-white mt-1">info@toplistorlando.com</p>
                     </div>
                   </div>
                 </div>
