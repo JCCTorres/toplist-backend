@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-07)
+See: .planning/PROJECT.md (updated 2026-02-08)
 
 **Core value:** Guests can browse available properties, check real-time availability via Bookerville, and seamlessly proceed to book through Airbnb
-**Current focus:** MILESTONE COMPLETE — All 3 phases finished
+**Current focus:** v1.0 shipped — planning next milestone
 
 ## Current Position
 
-Phase: 3 of 3 (Design Polish & Deployment)
-Plan: 2 of 2 complete in current phase
-Status: Milestone Complete
-Last activity: 2026-02-08 - Completed 03-02-PLAN.md (Production build and Railway deployment guide)
+Phase: 3 of 3 (all complete)
+Plan: All complete
+Status: v1.0 Milestone Shipped
+Last activity: 2026-02-08 — v1.0 milestone archived
 
-Progress: [██████████] 100% (6/6 plans)
+Progress: [##########] 100% (6/6 plans, 18/18 requirements)
 
 ## Performance Metrics
 
@@ -34,24 +34,15 @@ Progress: [██████████] 100% (6/6 plans)
 
 ### Decisions
 
-- [Roadmap]: Quick depth (3 phases) to ship today
-- [Roadmap]: Same-origin serving (Laravel serves React build) to avoid CORS
-- [01-01]: Native fetch over axios/react-query
-- [01-02]: Parallel API fetches for details and availability
-- [02-01]: URL params for search state (shareable links)
-- [02-02]: Airbnb notice above Book Now for clear UX messaging
-- [03-01]: Starfield animation, dark palette, Montserrat/Poppins typography
-- [03-01]: Dual footer system (SimpleFooter on Home, FullFooter elsewhere)
-- [03-01]: Resorts removed from nav (files kept for rollback)
-- [03-02]: Railway over Cloudways (instant signup, no verification wait)
+Archived to PROJECT.md Key Decisions table. All outcomes marked Good.
 
 ### Blockers/Concerns
 
-- Exposed API credentials in .env.example (security — document in deployment)
 - CORS wildcard in config/cors.php (tighten for production domain)
+- API credentials in .env.example (clean up before public repo)
 
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Milestone complete — all 6 plans across 3 phases executed
-Resume file: None
+Stopped at: v1.0 milestone complete and archived
+Resume: `/gsd:new-milestone` for v1.1
