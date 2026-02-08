@@ -13,10 +13,9 @@ const HeroSection = ({ searchBarProps }) => {
         <div className="video-dark-overlay"></div>
       </div>
 
-      {/* Hero Content */}
-      <div className="container mx-auto px-4 relative z-10 flex-1 flex flex-col justify-center items-center pt-20">
-        {/* Search Bar + Tagline */}
-        <div className="w-full max-w-5xl opacity-0 animate-fade-up">
+      {/* Hero Content — absolute center */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center px-4">
+        <div className="w-full max-w-4xl opacity-0 animate-fade-up">
           <p className="text-gold-400 text-sm md:text-base font-semibold tracking-[0.25em] uppercase mb-5 text-center">
             Orlando's Premier Vacation Rentals
           </p>
