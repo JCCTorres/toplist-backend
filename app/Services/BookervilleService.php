@@ -867,25 +867,46 @@ class BookervilleService
                 'error' => (string) $xml->errorMessage ?? 'Erro desconhecido'
             ];
         }
-        $res = [];
+
+        // Pre-load ALL local properties once for reliable matching
+        $allProperties = Property::where('is_active', true)->get();
+
+        // Build multiple lookup maps for matching
+        $byPropertyId = [];
+        $byAddressFragment = [];
+        foreach ($allProperties as $prop) {
+            $byPropertyId[$prop->property_id] = $prop;
+            // Index by street number + street name fragment for fuzzy matching
+            $addr = strtolower(trim(is_array($prop->address) ? json_encode($prop->address) : ($prop->address ?? '')));
+            if (!empty($addr)) {
+                // Extract house number from address for matching
+                if (preg_match('/(\d+\s+[\w\s]+(?:ct|dr|ln|blvd|cir|st|ave|rd|way|pl))/i', $addr, $m)) {
+                    $byAddressFragment[strtolower(trim($m[1]))] = $prop;
+                }
+                $byAddressFragment[$addr] = $prop;
+            }
+        }
 
         if (isset($xml->MultiPropertySearchResult)) {
 
             foreach ($xml->MultiPropertySearchResult as $result) {
-                $res[] = $result;
                 // Extrair ID do Airbnb da URL
                 $airbnbId = '';
                 $propertyUrl = (string) $result->propertyWebsiteURL;
                 if (preg_match('/\/rooms\/(\d+)/', $propertyUrl, $matches)) {
-
                     $airbnbId = $matches[1];
+                }
+
+                // Try to extract Bookerville property ID from bookingTargetURL
+                $bookingTargetUrl = (string) $result->bookingTargetURL;
+                $bookervilleId = null;
+                if (preg_match('/bkvPropertyId=(\d+)/', $bookingTargetUrl, $m)) {
+                    $bookervilleId = $m[1];
                 }
 
                 // Extrair preço
                 $price = 0;
                 $priceString = (string) $result->bookingPriceFrom;
-
-                // Remover cifrão, vírgulas e extrair apenas números e ponto decimal
                 $cleanPrice = preg_replace('/[^\d.]/', '', $priceString);
                 if (!empty($cleanPrice) && is_numeric($cleanPrice)) {
                     $price = (float) $cleanPrice;
@@ -906,24 +927,62 @@ class BookervilleService
                     }
                 }
 
-                $propertyBase = $this->searchPropertiesByAddress($address, 1,$result->propertyDisplayName);
+                // Match with local property using multiple strategies
                 $propertyRecord = null;
-        
-                if ($propertyBase['success']) {
 
-                    $propertyRecord = $propertyBase['data']['properties'] ?? null;
+                // Strategy 1: Match by Bookerville property ID (most reliable)
+                if ($bookervilleId && isset($byPropertyId[$bookervilleId])) {
+                    $propertyRecord = $byPropertyId[$bookervilleId];
+                }
+
+                // Strategy 2: Match by address fragment
+                if (!$propertyRecord && !empty($address)) {
+                    $addrLower = strtolower(trim($address));
+                    if (isset($byAddressFragment[$addrLower])) {
+                        $propertyRecord = $byAddressFragment[$addrLower];
+                    } else {
+                        // Try extracting house number + street from the search address
+                        if (preg_match('/(\d+\s+[\w\s]+(?:ct|dr|ln|blvd|cir|st|ave|rd|way|pl))/i', $addrLower, $m)) {
+                            $fragment = strtolower(trim($m[1]));
+                            if (isset($byAddressFragment[$fragment])) {
+                                $propertyRecord = $byAddressFragment[$fragment];
+                            }
+                        }
+                    }
+                }
+
+                // Strategy 3: Fallback to LIKE search on title/address
+                if (!$propertyRecord && !empty($address)) {
+                    $propertyRecord = Property::where('address', 'LIKE', "%{$address}%")
+                        ->orWhere('title', 'LIKE', "%{$propertyName}%")
+                        ->first();
                 }
 
                 $detailsForExtraction = $propertyRecord['details'] ?? [];
-
                 $b_b = $this->extractBedroomsAndBathrooms($detailsForExtraction);
-
                 $cityNew = $this->extractCity($detailsForExtraction);
 
-               
+                // Determine best image: local DB first, then Bookerville (skip placeholders)
+                $bookervilleImage = (string) ($result->propertyMainPhotoURL ?? '');
+                $isPlaceholder = empty($bookervilleImage)
+                    || str_contains(strtolower($bookervilleImage), 'noprimaryphoto')
+                    || str_contains(strtolower($bookervilleImage), 'placeholder');
+
+                $mainImage = $propertyRecord->main_image ?? null;
+                if (empty($mainImage) && !$isPlaceholder) {
+                    $mainImage = $bookervilleImage;
+                }
+                // If still no image, try photos array
+                if (empty($mainImage) && $propertyRecord) {
+                    $photos = $propertyRecord->photos ?? [];
+                    if (is_array($photos) && count($photos) > 0) {
+                        $mainImage = $photos[0];
+                    }
+                }
+
                 $results[] = [
-                    'property_id' => $propertyRecord->property_id ?? null,
-                    'airbnb_id' => $airbnbId,
+                    'property_id' => $propertyRecord->property_id ?? $bookervilleId,
+                    'airbnb_id' => $propertyRecord ? ($propertyRecord->airbnb_id ?? $airbnbId) : $airbnbId,
                     'property_name' => $propertyName,
                     'address' => $address,
                     'b_b' => $b_b,
@@ -933,10 +992,11 @@ class BookervilleService
                     'property_type' => $propertyRecord->property_type ?? '',
                     'max_guests' => (int) $result->propertyMaxOccupants ?? 6,
                     'description' => (string) $result->propertyShortDescription ?? '',
-                    'main_image' => $propertyRecord->main_image ?? $result->propertyMainPhotoURL ?? '',
+                    'main_image' => $mainImage ?? '',
+                    'photos' => $propertyRecord ? ($propertyRecord->photos ?? []) : [],
                     'booking_price' => $price,
                     'booking_message' => (string) $result->bookingMessage ?? '',
-                    'booking_target_url' => (string) $result->bookingTargetURL ?? '',
+                    'booking_target_url' => $bookingTargetUrl,
                     'airbnb_url' => $propertyUrl,
                     'last_booked' => (string) $result->lastBooked ?? '',
                     'is_available' => (string) $result->bookingMessage === 'Ok'
