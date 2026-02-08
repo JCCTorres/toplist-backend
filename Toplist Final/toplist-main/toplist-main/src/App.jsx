@@ -14,8 +14,7 @@ import Admin from './pages/Admin.jsx';
 import Guest from './pages/Guest.jsx';
 import PropertyDetails from './pages/PropertyDetails.jsx';
 
-// Layout component to handle conditional footer rendering
-function AppLayout() {
+function AppContent() {
   const location = useLocation();
   const isHome = location.pathname === '/';
 
@@ -45,7 +44,7 @@ function AppLayout() {
 function App() {
   return (
     <Router>
-      <AppLayout />
+      <AppContent />
     </Router>
   );
 }
