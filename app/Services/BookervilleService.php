@@ -1035,6 +1035,26 @@ class BookervilleService
             return $property['is_available'] === true;
         });
 
+        // Secondary validation: verify each property's availability using the per-property API
+        // This catches cases where the bulk API returns 'Ok' but the property is actually booked
+        $startDate = $searchParams['startDate'] ?? null;
+        $endDate = $searchParams['endDate'] ?? null;
+
+        if ($startDate && $endDate) {
+            $verifiedResults = [];
+            foreach ($availableResults as $property) {
+                $propertyId = $property['property_id'] ?? null;
+                if ($propertyId && $this->isDateRangeAvailable($propertyId, $startDate, $endDate)) {
+                    $verifiedResults[] = $property;
+                } else if (!$propertyId) {
+                    // If no property ID, include it (can't verify)
+                    $verifiedResults[] = $property;
+                }
+                // Properties that fail verification are silently excluded
+            }
+            $availableResults = $verifiedResults;
+        }
+
         // Re-index array to ensure consecutive numeric keys
         $availableResults = array_values($availableResults);
 
@@ -1052,6 +1072,96 @@ class BookervilleService
     private function validateCredentials(): bool
     {
         return !empty($this->apiKey) && !empty($this->accountId);
+    }
+
+    /**
+     * Check if a date range is truly available for a property by fetching BookedStays
+     * from the per-property API and checking for overlaps.
+     *
+     * @param string $propertyId Bookerville property ID
+     * @param string $startDate Search start date (Y-m-d)
+     * @param string $endDate Search end date (Y-m-d)
+     * @return bool True if the date range is available, false if blocked
+     */
+    private function isDateRangeAvailable(string $propertyId, string $startDate, string $endDate): bool
+    {
+        try {
+            // Fetch BookedStays from per-property API
+            $url = "{$this->baseUrl}/API-PropertyAvailability?s3cr3tK3y={$this->apiKey}&bkvPropertyId={$propertyId}";
+
+            $response = Http::timeout(5)
+                ->withoutVerifying()
+                ->withHeaders([
+                    'Accept' => 'application/xml, text/xml, */*',
+                    'User-Agent' => 'Laravel-Bookerville-Client/1.0'
+                ])
+                ->get($url);
+
+            if (!$response->successful()) {
+                Log::warning('Failed to fetch property availability for validation', [
+                    'propertyId' => $propertyId,
+                    'status' => $response->status()
+                ]);
+                // If we can't verify, assume available (fail open to avoid blocking all results)
+                return true;
+            }
+
+            $xmlData = $response->body();
+            $xml = simplexml_load_string($xmlData);
+
+            if ($xml === false || !isset($xml->BookedStays)) {
+                // No BookedStays means property is available
+                return true;
+            }
+
+            $bookedStays = $xml->BookedStays->BookedStay ?? [];
+
+            // Normalize to array
+            if (!is_array($bookedStays) && !($bookedStays instanceof \Traversable)) {
+                $bookedStays = [$bookedStays];
+            }
+
+            $searchStart = strtotime($startDate);
+            $searchEnd = strtotime($endDate);
+
+            foreach ($bookedStays as $stay) {
+                $status = strtolower((string) $stay->BookingStatus);
+
+                // Skip cancelled bookings
+                if ($status === 'cancelled') {
+                    continue;
+                }
+
+                $arrivalDate = strtotime((string) $stay->ArrivalDate);
+                $departureDate = strtotime((string) $stay->DepartureDate);
+
+                // Check for date range overlap
+                // Overlap exists if: searchStart < departureDate AND searchEnd > arrivalDate
+                if ($searchStart < $departureDate && $searchEnd > $arrivalDate) {
+                    Log::info('Property unavailable for date range', [
+                        'propertyId' => $propertyId,
+                        'searchStart' => $startDate,
+                        'searchEnd' => $endDate,
+                        'bookedArrival' => (string) $stay->ArrivalDate,
+                        'bookedDeparture' => (string) $stay->DepartureDate,
+                        'bookingStatus' => $status
+                    ]);
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Error checking date range availability', [
+                'propertyId' => $propertyId,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'error' => $e->getMessage()
+            ]);
+            // Fail open - if we can't verify, assume available
+            return true;
+        }
     }
 
     /**
