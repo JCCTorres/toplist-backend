@@ -142,12 +142,12 @@ section {
 
 /* ── Card hover lift ── */
 .card-hover {
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.35s ease;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .card-hover:hover {
   transform: translateY(-4px);
+  --tw-ring-color: rgba(255, 255, 255, 0.18);
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.06), 0 0 40px rgba(212, 175, 55, 0.04);
-  border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* ── Image zoom on card hover ── */

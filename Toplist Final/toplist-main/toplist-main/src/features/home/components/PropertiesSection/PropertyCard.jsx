@@ -11,7 +11,7 @@ const PropertyCard = ({ property, searchParams }) => {
   const hasStructuredDetails = property.bedrooms || property.bathrooms || property.max_guests;
 
   return (
-    <div className="card-hover bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden flex flex-col h-full border border-white/10 shadow-sm">
+    <div className="card-hover bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden flex flex-col h-full ring-1 ring-white/10 shadow-sm">
       <div className="relative h-64 overflow-hidden bg-navy-900">
         {image ? (
           <>
