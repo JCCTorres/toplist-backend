@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toplist Vacations - Available Homes</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <!-- Header with Navigation -->
+    <header class="bg-blue-50 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center logo-link" title="Return to Homepage">
+                    <img src="images/logo.svg" alt="Toplist Vacations Logo" class="h-10 w-10 rounded-full">
+                    <span class="ml-2 font-semibold text-blue-800">Toplist Vacations</span>
+                </a>
+                <nav class="ml-6">
+                    <ul class="flex space-x-6 text-gray-700">
+                        <li><a href="homes.html"
+                                class="font-semibold hover:text-blue-600 border-b-2 border-blue-600">HOMES</a></li>
+                        <li><a href="resorts.html" class="font-semibold hover:text-blue-600">RESORTS</a></li>
+                        <li><a href="management.html" class="font-semibold hover:text-blue-600">MANAGEMENT</a></li>
+                        <li><a href="services.html" class="font-semibold hover:text-blue-600">SERVICES</a></li>
+                        <li><a href="contact.html" class="font-semibold hover:text-blue-600">CONTACT</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="flex space-x-2">
+                <a href="guest.html"
+                    class="bg-gray-300 text-gray-700 px-6 py-1 rounded-full hover:bg-gray-400">GUEST</a>
+                <a href="admin.html" class="bg-red-400 text-white px-6 py-1 rounded-full hover:bg-red-500">ADMIN</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="container mx-auto px-4 py-8">
+        <div id="main-search-bar" class="bg-white rounded-full overflow-hidden shadow-lg flex">
+            <!-- Resort Selector with dropdown -->
+            <div
+                class="search-bar-section resort-selector bg-blue-700 text-white py-3 px-6 font-semibold flex-1 relative">
+                <div class="dropdown-toggle flex items-center justify-between cursor-pointer w-full">
+                    <span id="selected-resort">All Resorts</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div
+                    class="resort-dropdown absolute top-full left-0 mt-1 bg-white text-gray-800 rounded-md shadow-lg z-10 w-full hidden">
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="all">All Resorts</div>
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="fantasy-world">Fantasy World Resort
+                    </div>
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="terra-verde">Terra Verde Resort</div>
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="solara">Solara Resort</div>
+                </div>
+            </div>
+
+            <!-- Travel Dates with calendar -->
+            <div
+                class="search-bar-section travel-dates bg-blue-700 text-white py-3 px-6 font-semibold flex-1 cursor-pointer">
+                <div id="date-range-toggle" class="flex items-center justify-between">
+                    <span>Travel Dates</span>
+                    <i class="fas fa-calendar ml-2"></i>
+                </div>
+                <input id="date-range-picker" type="text" class="date-range-input hidden" placeholder="Select dates...">
+            </div>
+
+            <div
+                class="search-bar-section options bg-blue-600 py-3 px-6 font-semibold flex-1 flex items-center justify-between">
+                Options <i class="fas fa-chevron-down text-red-400"></i>
+            </div>
+
+            <!-- Guests input field -->
+            <div class="search-bar-section guests bg-white flex items-center px-6 font-semibold flex-1">
+                <input type="number" min="1" placeholder="Guests" class="w-full outline-none text-black bg-transparent">
+            </div>
+
+            <!-- House name input field -->
+            <div class="search-bar-section house bg-white flex items-center px-6 font-semibold flex-1">
+                <input type="text" placeholder="House name" class="w-full outline-none text-black bg-transparent">
+            </div>
+
+            <button
+                class="search-bar-section search-btn bg-red-400 text-white py-3 px-6 font-semibold flex-1 hover:bg-red-500">Search</button>
+        </div>
+    </div>
+
+    <!-- Available Properties Section -->
+    <section class="container mx-auto px-4 py-8">
+        <h2 class="text-2xl font-semibold mb-8">Available Properties</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Property Card 1 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-1.jpg" alt="Fantasy World Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">2 Bedrooms / 2 Baths / Fantasy World</div>
+                    <div class="text-gray-700 mb-2">Fantasy World Resort • Townhouse</div>
+                    <div class="text-gray-700 mb-2">6 guests • 4 beds • 2 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i></div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 2 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-2.jpg" alt="Terra Verde Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">6 Bedrooms / 5.5 Baths / Terra Verde</div>
+                    <div class="text-gray-700 mb-2">Terra Verde Resort • Entire home</div>
+                    <div class="text-gray-700 mb-2">16 guests • 9 beds • 2 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i></div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 3 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-3.jpg" alt="Fantasy World Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">2 Bedrooms / 2 Baths / Fantasy World</div>
+                    <div class="text-gray-700 mb-2">Fantasy World Resort • Townhouse</div>
+                    <div class="text-gray-700 mb-2">6 guests • 3 beds • 2 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i></div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 4 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-4.jpg" alt="Lake Berkley Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">4 Bedrooms / 3 Baths / Lake Berkley</div>
+                    <div class="text-gray-700 mb-2">Lake Berkley Resort • Pool home</div>
+                    <div class="text-gray-700 mb-2">8 guests • 5 beds • 3 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i> <i
+                            class="fas fa-swimming-pool ml-2"></i></div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 5 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-5.jpg" alt="Solara Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">5 Bedrooms / 4 Baths / Solara</div>
+                    <div class="text-gray-700 mb-2">Solara Resort • Modern villa</div>
+                    <div class="text-gray-700 mb-2">12 guests • 7 beds • 4 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i> <i class="fas fa-gamepad ml-2"></i>
+                    </div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 6 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-6.jpg" alt="Terra Verde Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">3 Bedrooms / 2 Baths / Terra Verde</div>
+                    <div class="text-gray-700 mb-2">Terra Verde Resort • Townhouse</div>
+                    <div class="text-gray-700 mb-2">8 guests • 4 beds • 2 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i> <i class="fas fa-table-tennis ml-2"></i>
+                    </div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 7 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-7.jpg" alt="Lake Berkley Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">5 Bedrooms / 3 Baths / Lake Berkley</div>
+                    <div class="text-gray-700 mb-2">Lake Berkley Resort • Lakefront home</div>
+                    <div class="text-gray-700 mb-2">10 guests • 6 beds • 3 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i> <i class="fas fa-fish ml-2"></i></div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 8 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-8.jpg" alt="Solara Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">4 Bedrooms / 3.5 Baths / Solara</div>
+                    <div class="text-gray-700 mb-2">Solara Resort • Contemporary home</div>
+                    <div class="text-gray-700 mb-2">9 guests • 5 beds • 3.5 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i> <i class="fas fa-hot-tub ml-2"></i>
+                    </div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 9 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md flex flex-col h-full min-h-[450px]">
+                <div class="relative h-64">
+                    <img src="images/properties/property-9.jpg" alt="Fantasy World Property"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="text-gray-700 mb-2">4 Bedrooms / 3 Baths / Fantasy World</div>
+                    <div class="text-gray-700 mb-2">Fantasy World Resort • Vacation home</div>
+                    <div class="text-gray-700 mb-2">10 guests • 6 beds • 3 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i> <i class="fas fa-dumbbell ml-2"></i>
+                    </div>
+                    <div class="mt-auto">
+                        <a href="property-details.html"
+                            class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simplified Pagination without numbers -->
+    <div class="container mx-auto px-4 py-8 flex justify-center">
+        <div class="flex space-x-2">
+            <button class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- WhatsApp Float Button -->
+    <div class="fixed bottom-6 right-6">
+        <a href="#" class="bg-green-500 text-white rounded-full h-14 w-14 flex items-center justify-center shadow-lg">
+            <i class="fab fa-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

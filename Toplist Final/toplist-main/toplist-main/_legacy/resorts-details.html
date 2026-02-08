@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toplist Vacations - Resort Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header with Navigation -->
+    <header class="bg-blue-50 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://via.placeholder.com/50" alt="Toplist Vacations Logo" class="h-10 w-10 rounded-full">
+                <nav class="ml-6">
+                    <ul class="flex space-x-6 text-gray-700">
+                        <li><a href="homes.html" class="font-semibold hover:text-blue-600">HOMES</a></li>
+                        <li><a href="resorts.html" class="font-semibold hover:text-blue-600 border-b-2 border-blue-600">RESORTS</a></li>
+                        <li><a href="management.html" class="font-semibold hover:text-blue-600">MANAGEMENT</a></li>
+                        <li><a href="services.html" class="font-semibold hover:text-blue-600">SERVICES</a></li>
+                        <li><a href="contact.html" class="font-semibold hover:text-blue-600">CONTACT</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="flex space-x-2">
+                <button class="bg-gray-300 text-gray-700 px-6 py-1 rounded-full hover:bg-gray-400">GUEST</button>
+                <button class="bg-red-400 text-white px-6 py-1 rounded-full hover:bg-red-500">ADMIN</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="container mx-auto px-4 py-8">
+        <div id="main-search-bar" class="bg-white rounded-full overflow-hidden shadow-lg flex">
+            <!-- Resort Selector with dropdown -->
+            <div class="search-bar-section resort-selector bg-blue-700 text-white py-3 px-6 font-semibold flex-1 relative">
+                <div class="dropdown-toggle flex items-center justify-between cursor-pointer w-full">
+                    <span id="selected-resort">All Resorts</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="resort-dropdown absolute top-full left-0 mt-1 bg-white text-gray-800 rounded-md shadow-lg z-10 w-full hidden">
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="all">All Resorts</div>
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="fantasy-world">Fantasy World Resort</div>
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="terra-verde">Terra Verde Resort</div>
+                    <div class="p-2 hover:bg-gray-100 cursor-pointer" data-value="solara">Solara Resort</div>
+                </div>
+            </div>
+            
+            <!-- Travel Dates with calendar -->
+            <div class="search-bar-section travel-dates bg-blue-700 text-white py-3 px-6 font-semibold flex-1 cursor-pointer">
+                <div id="date-range-toggle" class="flex items-center justify-between">
+                    <span>Travel Dates</span>
+                    <i class="fas fa-calendar ml-2"></i>
+                </div>
+                <input id="date-range-picker" type="text" class="date-range-input hidden" placeholder="Select dates...">
+            </div>
+            
+            <div class="search-bar-section options bg-blue-600 py-3 px-6 font-semibold flex-1 flex items-center justify-between">
+                Options <i class="fas fa-chevron-down text-red-400"></i>
+            </div>
+            
+            <!-- Guests input field -->
+            <div class="search-bar-section guests bg-white flex items-center px-6 font-semibold flex-1">
+                <input type="number" min="1" placeholder="Guests" class="w-full outline-none text-black bg-transparent">
+            </div>
+            
+            <!-- House name input field -->
+            <div class="search-bar-section house bg-white flex items-center px-6 font-semibold flex-1">
+                <input type="text" placeholder="House name" class="w-full outline-none text-black bg-transparent">
+            </div>
+            
+            <button class="search-bar-section search-btn bg-red-400 text-white py-3 px-6 font-semibold flex-1 hover:bg-red-500">Search</button>
+        </div>
+    </div>
+
+    <!-- Resort Info Section -->
+    <section class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="relative h-96">
+                <img id="resort-image" src="https://via.placeholder.com/1200x600/336699" alt="Resort Image" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-6">
+                    <h1 id="resort-name" class="text-3xl font-bold">Fantasy World Resort</h1>
+                    <div class="flex mt-2">
+                        <div class="mr-6">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span id="resort-location">Kissimmee, Florida</span>
+                        </div>
+                        <div>
+                            <i class="fas fa-car mr-2"></i>
+                            <span id="resort-distance">3 miles to Disney World</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <h2 class="text-2xl font-bold mb-4">About This Resort</h2>
+                <p id="resort-description" class="text-gray-700 mb-6">
+                    Fantasy World Resort offers the perfect combination of convenience, comfort, and fun for your Orlando vacation. The resort features a water park with slides, a lazy river, and multiple swimming pools. Guests can enjoy the fitness center, tennis courts, and on-site restaurant. 
+                    <br><br>
+                    Located just 3 miles from Disney World, this gated community provides a secure and enjoyable environment for your family. All vacation homes in this resort offer modern amenities and are professionally maintained.
+                </p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <i class="fas fa-swimming-pool text-blue-500 text-2xl mb-2"></i>
+                        <div class="text-gray-700">Water Park</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <i class="fas fa-dumbbell text-blue-500 text-2xl mb-2"></i>
+                        <div class="text-gray-700">Fitness Center</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <i class="fas fa-table-tennis text-blue-500 text-2xl mb-2"></i>
+                        <div class="text-gray-700">Tennis Courts</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <i class="fas fa-utensils text-blue-500 text-2xl mb-2"></i>
+                        <div class="text-gray-700">Restaurant</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Available Properties Section -->
+    <section class="container mx-auto px-4 py-8">
+        <h2 class="text-2xl font-semibold mb-8">Available Properties in This Resort</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Property Card 1 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md">
+                <div class="relative h-64">
+                    <img src="https://via.placeholder.com/400x300" alt="Fantasy World Property" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <div class="text-gray-700 mb-2">2 Bedrooms / 2 Baths</div>
+                    <div class="text-gray-700 mb-2">Fantasy World Resort • Townhouse</div>
+                    <div class="text-gray-700 mb-2">6 guests • 4 beds • 2 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i></div>
+                    <a href="property-details.html" class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View Details</a>
+                </div>
+            </div>
+
+            <!-- Property Card 2 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md">
+                <div class="relative h-64">
+                    <img src="https://via.placeholder.com/400x300/225566" alt="Fantasy World Property" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <div class="text-gray-700 mb-2">3 Bedrooms / 2 Baths</div>
+                    <div class="text-gray-700 mb-2">Fantasy World Resort • Townhouse</div>
+                    <div class="text-gray-700 mb-2">8 guests • 5 beds • 2 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i></div>
+                    <a href="property-details.html" class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View Details</a>
+                </div>
+            </div>
+
+            <!-- Property Card 3 -->
+            <div class="bg-gray-200 rounded-lg overflow-hidden shadow-md">
+                <div class="relative h-64">
+                    <img src="https://via.placeholder.com/400x300/557788" alt="Fantasy World Property" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <div class="text-gray-700 mb-2">4 Bedrooms / 3 Baths</div>
+                    <div class="text-gray-700 mb-2">Fantasy World Resort • Townhouse</div>
+                    <div class="text-gray-700 mb-2">10 guests • 7 beds • 3 baths</div>
+                    <div class="text-gray-500 mb-4"><i class="fas fa-wifi"></i></div>
+                    <a href="property-details.html" class="bg-blue-900 text-white py-2 px-4 rounded-lg w-full block text-center">View Details</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp Float Button -->
+    <div class="fixed bottom-6 right-6">
+        <a href="#" class="bg-green-500 text-white rounded-full h-14 w-14 flex items-center justify-center shadow-lg">
+            <i class="fab fa-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Simple script to update resort details based on URL parameter
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const resort = urlParams.get('resort');
+            
+            if (resort === 'terra-verde') {
+                document.getElementById('resort-name').textContent = 'Terra Verde Resort';
+                document.getElementById('resort-location').textContent = 'Kissimmee, Florida';
+                document.getElementById('resort-distance').textContent = '7 miles to Disney World';
+                document.getElementById('resort-image').src = 'https://via.placeholder.com/1200x600/225566';
+                document.getElementById('resort-description').innerHTML = 'Terra Verde Resort is a gated resort community featuring luxury vacation homes with access to a clubhouse, swimming pool, and sports facilities. The resort offers 24-hour security, making it a safe and relaxing environment for your vacation.<br><br>Located 7 miles from Disney World, Terra Verde is also convenient to other Orlando attractions, shopping, and dining options.';
+                
+                // Update the dropdown selection to match the current resort
+                document.getElementById('selected-resort').textContent = 'Terra Verde Resort';
+            } else if (resort === 'solara') {
+                document.getElementById('resort-name').textContent = 'Solara Resort';
+                document.getElementById('resort-location').textContent = 'Kissimmee, Florida';
+                document.getElementById('resort-distance').textContent = '10 miles to Disney World';
+                document.getElementById('resort-image').src = 'https://via.placeholder.com/1200x600/557788';
+                document.getElementById('resort-description').innerHTML = 'Solara Resort is a luxurious gated community offering exceptional vacation homes and world-class amenities. The resort features a spectacular water complex with a FlowRider surf simulator, splash pad, and heated pools. Other amenities include a state-of-the-art fitness center, sports courts, and a clubhouse with restaurant.<br><br>Located 10 miles from Disney World, Solara Resort provides a perfect balance of relaxation and convenience for your Orlando vacation.';
+                
+                // Update the dropdown selection to match the current resort
+                document.getElementById('selected-resort').textContent = 'Solara Resort';
+            } else if (resort === 'fantasy-world') {
+                // Update the dropdown selection to match the current resort
+                document.getElementById('selected-resort').textContent = 'Fantasy World Resort';
+            }
+        });
+    </script>
+</body>
+</html>

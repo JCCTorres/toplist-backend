@@ -1,0 +1,587 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Base styles */
+:root {
+    --primary-blue: #3b4f6b;
+    --secondary-blue: #a5b3cb;
+    --darker-blue: #2c4463;
+    --lighter-blue: #4b6e9e;
+    --primary-red: #f87171;  /* Softer red */
+    --light-gray: #e2e8f0;
+    --soft-dark-blue: #47648d;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    padding-top: 60px; /* Add padding for fixed header */
+}
+
+/* Adjusted for fixed header - add padding to the top */
+#home {
+    min-height: 100vh;
+    height: 100vh; /* Fixed height to limit to viewport */
+    padding-top: 60px; /* Adjust based on header height */
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0; /* Ensure no gap between sections */
+}
+
+/* Header Styles */
+header {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+/* Add this for semi-transparent header on scroll */
+header.scrolled {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Add padding to content after header */
+.container:first-of-type {
+    padding-top: 0;
+}
+
+/* Page title styling for section pages */
+.page-title {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 0;
+}
+
+/* Property details title styling */
+.property-title-container {
+    padding-top: 80px;
+    margin-bottom: 20px;
+}
+
+.property-title-container h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1a202c;
+}
+
+.property-address {
+    font-size: 1.2rem;
+    color: #4a5568;
+    margin-top: 0.5rem;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.logo-link:hover {
+    transform: scale(1.05);
+}
+
+.logo-link img {
+    border: 2px solid var(--primary-blue);
+}
+
+.nav-link {
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    text-transform: uppercase;
+}
+
+.nav-link.active {
+    border-bottom: 2px solid var(--primary-blue);
+}
+
+/* Full Screen Video Background - Complete fix */
+.video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Ensure this is lowest */
+    overflow: hidden;
+}
+
+.fullscreen-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-size: cover;
+    background-position: center center;
+    z-index: -1; /* Lower than container */
+}
+
+/* Video dark overlay */
+.video-dark-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.35); /* Reduced opacity for less darkness */
+    z-index: 1; /* Above video but below content */
+}
+
+/* Remove video overlay */
+.video-overlay {
+    display: none;
+}
+
+/* Section styles for one-page layout */
+section {
+    position: relative;
+    z-index: 1;
+    padding-top: 100px; /* Add padding for fixed header */
+    margin-top: -20px; /* Adjust to prevent gaps */
+}
+
+section:not(#home) {
+    background-color: #fff; /* Make non-home sections fully opaque */
+    position: relative;
+    z-index: 2;
+    min-height: auto; /* Allow sections to be sized by content */
+    height: auto;
+}
+
+/* Search Bar Styles */
+.search-bar-section {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+/* Override overflow for the main search bar container */
+#main-search-bar {
+    overflow: visible !important; 
+    z-index: 10;
+}
+
+.resort-selector, .travel-dates {
+    background-color: var(--darker-blue);
+    position: relative;
+    overflow: visible !important;
+}
+
+.options {
+    background-color: var(--lighter-blue);
+}
+
+.search-btn {
+    background-color: var(--primary-red);
+}
+
+.resort-dropdown {
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.resort-dropdown.active {
+    max-height: 200px;
+    opacity: 1;
+    display: block;
+}
+
+/* Date picker styles */
+.date-range-input {
+    /* Keep hidden or manage visibility via JS if needed */
+    position: absolute;
+    visibility: hidden;
+    height: 0;
+    width: 0;
+}
+
+.flatpickr-calendar {
+    z-index: 9999 !important; /* Keep high z-index */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+    background: #fff !important;
+    border-radius: 5px !important;
+    margin-top: 4px !important;
+}
+
+/* Position the calendar properly relative to toggle */
+.travel-dates {
+    position: relative !important;
+    overflow: visible !important;
+}
+
+/* Ensure the search bar doesn't cover the calendar */
+#main-search-bar {
+    overflow: visible !important;
+    z-index: 10;
+}
+
+/* Making sure the calendar days are visible */
+.flatpickr-day {
+    color: #333 !important;
+    background-color: white !important;
+}
+
+.flatpickr-day.selected {
+    background-color: var(--darker-blue) !important; /* Keep important for theme override */
+    color: white !important;
+}
+
+.flatpickr-day.inRange {
+    background-color: var(--secondary-blue) !important; /* Keep important for theme override */
+}
+
+.flatpickr-months {
+    background-color: var(--primary-blue) !important;
+    color: white !important;
+}
+
+.flatpickr-current-month,
+.flatpickr-monthDropdown-months,
+.flatpickr-month,
+.flatpickr-weekdays,
+.flatpickr-weekday {
+    color: white !important;
+    background-color: var(--primary-blue) !important;
+}
+
+/* Carousel Styles */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Fade Carousel Style */
+.carousel-slide.fade {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-slide.fade:first-child {
+    display: block;
+}
+
+.fade {
+    animation-name: fade;
+    animation-duration: 1.5s;
+}
+
+@keyframes fade {
+    from {opacity: .4}
+    to {opacity: 1}
+}
+
+/* Sliding Carousel Style */
+.carousel-slide.flex {
+    display: flex;
+    transition: transform 1s ease-in-out;
+    height: 100%;
+}
+
+.carousel-slide.flex img {
+    flex-shrink: 0;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Hero Section */
+.hero-text {
+    font-weight: 400;
+    color: black;
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8);
+}
+
+/* Service Card Styles */
+.service-container {
+    margin-bottom: 1rem;
+}
+
+.service-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Service Cards - New Design */
+.rounded-lg.shadow-lg.overflow-hidden.bg-white {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rounded-lg.shadow-lg.overflow-hidden.bg-white:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.rounded-lg.shadow-lg.overflow-hidden.bg-white .relative {
+    position: relative !important;
+    overflow: hidden;
+}
+
+.rounded-lg.shadow-lg.overflow-hidden.bg-white video {
+    transition: transform 0.5s ease;
+}
+
+.rounded-lg.shadow-lg.overflow-hidden.bg-white:hover video {
+    transform: scale(1.05);
+}
+
+/* Service Cards - Ensure proper stacking and positioning */
+.service-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    isolation: isolate; /* Create stacking context for each card */
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.service-card .relative {
+    position: relative !important; /* Parent container for the tag */
+    overflow: hidden;
+}
+
+.service-card video {
+    transition: transform 0.5s ease;
+    display: block; /* Ensure video is block level */
+}
+
+.service-card:hover video {
+    transform: scale(1.05);
+}
+
+/* Service Tag Styling */
+.service-tag {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    background-color: rgba(30, 58, 138, 0.8); /* Semi-transparent blue background */
+    padding: 8px 12px;
+    z-index: 10;
+    text-align: center;
+}
+
+/* Remove any conflicting styles */
+
+/* Property Cards */
+.property-card {
+    background: var(--light-gray);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.property-image {
+    height: 250px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.property-info {
+    padding: 1.5rem;
+}
+
+/* WhatsApp Button */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: #25d366;
+    color: white;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+/* Complimentary Extras Section */
+.flex.justify-center.gap-8 {
+    transition: transform 0.5s ease;
+}
+
+.rounded-full.overflow-hidden {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rounded-full.overflow-hidden:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.absolute.left-0.top-1\/2, 
+.absolute.right-0.top-1\/2 {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.absolute.left-0.top-1\/2:hover, 
+.absolute.right-0.top-1\/2:hover {
+    background-color: rgba(52, 211, 191, 0.9);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.absolute.left-0.top-1\/2:disabled, 
+.absolute.right-0.top-1\/2:disabled {
+    cursor: not-allowed;
+}
+
+.absolute.bottom-8 {
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 600;
+}
+
+/* Responsive Design Media Queries */
+@media screen and (max-width: 1024px) {
+    /* Header adjustments */
+    header .container {
+        flex-direction: column;
+        padding: 0.5rem;
+    }
+    
+    header .flex.items-center {
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    
+    header nav {
+        margin-left: 0;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    header nav ul {
+        width: max-content;
+    }
+    
+    header .flex.space-x-2 {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    /* Search bar adjustments */
+    #main-search-bar {
+        flex-direction: column;
+        border-radius: 1rem;
+        overflow: visible;
+    }
+    
+    .search-bar-section {
+        width: 100%;
+        border-radius: 0;
+    }
+    
+    /* Make sure the calendar always appears fully */
+    .flatpickr-calendar {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 90vw !important;
+        max-width: 320px !important;
+        position: fixed !important;
+    }
+    
+    /* Ensure buttons are visible */
+    header .flex.space-x-2 {
+        display: flex;
+        margin-top: 0.5rem;
+    }
+    
+    /* Fix resort dropdown on mobile */
+    .resort-dropdown {
+        width: 100% !important;
+        left: 0 !important;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    /* Even smaller screens */
+    header nav ul {
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+    }
+    
+    header nav ul li a {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .logo-link span {
+        font-size: 0.9rem;
+    }
+    
+    /* Ensure guest and admin buttons are visible */
+    header .flex.space-x-2 a {
+        display: inline-block;
+        white-space: nowrap;
+    }
+}
+
+/* Flip card styles for management page */
+.flip-card {
+    perspective: 1000px;
+    width: 100%;
+    height: 250px;
+    margin-bottom: 1.5rem;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.flip-card-back {
+    transform: rotateY(180deg);
+}
