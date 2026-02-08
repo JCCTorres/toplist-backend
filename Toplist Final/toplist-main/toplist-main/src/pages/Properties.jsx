@@ -15,12 +15,20 @@ function Properties() {
 
   const hasSearchParams = checkin && checkout;
 
-  const { data, loading, error, refetch } = useApi(
+  // Always fetch the full properties list (has validated images from local DB)
+  const allPropsResponse = useApi(() => api.getProperties(), []);
+
+  // Fetch search results only when search params are present
+  const searchResponse = useApi(
     () => hasSearchParams
       ? api.searchProperties({ startDate: checkin, endDate: checkout, numAdults: adults, numChildren: children })
-      : api.getProperties(),
+      : Promise.resolve(null),
     [checkin, checkout, adults, children]
   );
+
+  const loading = hasSearchParams ? (searchResponse.loading || allPropsResponse.loading) : allPropsResponse.loading;
+  const error = hasSearchParams ? (searchResponse.error || allPropsResponse.error) : allPropsResponse.error;
+  const refetch = hasSearchParams ? searchResponse.refetch : allPropsResponse.refetch;
 
   if (loading) {
     return (
@@ -38,9 +46,51 @@ function Properties() {
     );
   }
 
+  // Build a lookup map from the full properties list (id -> property with image)
+  const allPropsData = allPropsResponse.data?.data?.data || allPropsResponse.data?.data || {};
+  const allPropsList = [...(allPropsData.properties || []), ...(allPropsData.resorts || [])];
+  const imageMap = {};
+  allPropsList.forEach(p => {
+    if (p.id) {
+      imageMap[p.id] = p;
+    }
+  });
+
+  // Handle double-nested API responses: {success, data: {success, data: {results}}}
+  const searchData = searchResponse.data;
+  const searchResults = searchData?.data?.data?.results || searchData?.data?.results || [];
+
+  // Normalize search results and enrich with images from the full properties list
+  const isPlaceholderImage = (url) =>
+    !url || url.includes('NoPrimaryPhoto') || url.includes('noprimaryphoto');
+
+  const normalizedSearchResults = searchResults.map(r => {
+    const rawUrl = typeof r.main_image === 'object' ? Object.values(r.main_image)[0] : r.main_image;
+    const searchImageUrl = isPlaceholderImage(rawUrl) ? null : rawUrl;
+
+    // Look up this property in the full list to get its validated image
+    const localProp = imageMap[r.property_id];
+    const localImage = localProp?.image || localProp?.main_image || null;
+
+    return {
+      id: r.property_id,
+      title: localProp?.title || r.property_name,
+      name: r.property_name,
+      image: searchImageUrl || localImage,
+      main_image: searchImageUrl || localImage,
+      photos: localProp?.photos || [],
+      city: r.city || localProp?.city,
+      max_guests: r.max_guests || localProp?.max_guests,
+      bedrooms: r.b_b?.bedrooms || localProp?.bedrooms,
+      bathrooms: r.b_b?.bathrooms || localProp?.bathrooms,
+      airbnb_id: r.airbnb_id || localProp?.airbnb_id,
+      guests: localProp?.guests,
+    };
+  });
+
   const properties = hasSearchParams
-    ? data?.data?.results || []
-    : [...(data?.data?.properties || []), ...(data?.data?.resorts || [])];
+    ? normalizedSearchResults
+    : allPropsList;
 
   return (
     <div className="min-h-screen pt-20">
@@ -74,18 +124,22 @@ function Properties() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {properties.map(property => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard
+              key={property.id}
+              property={property}
+              searchParams={hasSearchParams ? searchParams.toString() : ''}
+            />
           ))}
         </div>
 
         {properties.length === 0 && !loading && !error && (
           <div className="text-center py-12">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 max-w-lg mx-auto shadow-sm">
-              <svg className="w-16 h-16 text-navy-800/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 text-white/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h3 className="font-heading text-xl font-semibold text-navy-900 mb-2">No Properties Available</h3>
-              <p className="text-navy-800/50 mb-4">
+              <h3 className="font-heading text-xl font-semibold text-white mb-2">No Properties Available</h3>
+              <p className="text-sand-200/60 mb-4">
                 {hasSearchParams
                   ? 'No properties are available for your selected dates. Try different dates or contact us for assistance.'
                   : 'No properties found. Please check back later.'

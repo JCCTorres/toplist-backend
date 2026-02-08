@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const PropertyCard = ({ property }) => {
+const PropertyCard = ({ property, searchParams }) => {
   const title = property.title || property.name || 'Property';
   const image = property.image || property.main_image;
   const city = property.city;
@@ -64,7 +64,7 @@ const PropertyCard = ({ property }) => {
 
         <div className="mt-auto">
           <Link
-            to={`/property-details/${property.id}`}
+            to={`/property-details/${property.id}${searchParams ? `?${searchParams}` : ''}`}
             className="block w-full text-center bg-gold-500/20 text-gold-400 border border-gold-500/30 py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-gold-500/30 transition-colors"
           >
             View Details

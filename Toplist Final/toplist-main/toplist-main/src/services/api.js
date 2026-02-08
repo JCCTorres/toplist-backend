@@ -57,7 +57,11 @@ export const api = {
    * @returns {Promise<{success: boolean, data: Object}>}
    */
   getPropertyAvailability: async (id) => {
-    const response = await fetch(`${BASE_URL}/properties/${id}/real-availability`);
+    // Request 6 months of availability data so the calendar can show booked dates
+    const today = new Date();
+    const startDate = today.toISOString().split('T')[0];
+    const endDate = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate()).toISOString().split('T')[0];
+    const response = await fetch(`${BASE_URL}/properties/${id}/real-availability?startDate=${startDate}&endDate=${endDate}`);
     return handleResponse(response);
   },
 
@@ -77,6 +81,16 @@ export const api = {
         numChildren: parseInt(params.numChildren) || 0
       })
     });
+    return handleResponse(response);
+  },
+
+  /**
+   * Fetch guest reviews for a specific property
+   * @param {string} id - Property ID
+   * @returns {Promise<{success: boolean, data: Object}>}
+   */
+  getGuestReviews: async (id) => {
+    const response = await fetch(`${BASE_URL}/properties/${id}/reviews`);
     return handleResponse(response);
   },
 

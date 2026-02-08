@@ -96,6 +96,20 @@ section.hero-section {
 .flatpickr-months .flatpickr-month {
   height: 40px;
 }
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+  color: rgba(0, 0, 0, 0.18) !important;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.03) 3px,
+    rgba(0, 0, 0, 0.03) 6px
+  );
+  cursor: not-allowed;
+  text-decoration: line-through;
+  border-color: transparent;
+}
 
 /* ── Section scroll offset ── */
 section {
@@ -128,11 +142,12 @@ section {
 
 /* ── Card hover lift ── */
 .card-hover {
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.35s ease;
 }
 .card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(12, 21, 39, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.06), 0 0 40px rgba(212, 175, 55, 0.04);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* ── Image zoom on card hover ── */
@@ -159,6 +174,11 @@ section {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ── Hide scrollbar on thumbnail strips ── */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* ── Scrollbar ── */
