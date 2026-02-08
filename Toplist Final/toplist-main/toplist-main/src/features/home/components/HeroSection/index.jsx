@@ -14,7 +14,7 @@ const HeroSection = ({ searchBarProps }) => {
       </div>
 
       {/* Hero Content */}
-      <div className="container mx-auto px-4 relative z-10 flex-1 flex flex-col justify-end items-center pb-24">
+      <div className="container mx-auto px-4 relative z-10 flex-1 flex flex-col justify-center items-center pt-20">
         {/* Search Bar + Tagline */}
         <div className="w-full max-w-5xl opacity-0 animate-fade-up">
           <p className="text-gold-400 text-sm md:text-base font-semibold tracking-[0.25em] uppercase mb-5 text-center">
