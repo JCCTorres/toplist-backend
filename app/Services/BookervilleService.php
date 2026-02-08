@@ -874,16 +874,31 @@ class BookervilleService
         // Build multiple lookup maps for matching
         $byPropertyId = [];
         $byAddressFragment = [];
+        $byHouseNumber = [];
+        // Regex for street suffixes (abbreviated AND full-word forms)
+        $streetSuffixRegex = '/(\d+\s+[\w\s]+(?:court|circle|drive|boulevard|lane|place|avenue|road|way|ct|dr|ln|blvd|cir|st|ave|rd|pl))\b/i';
+
         foreach ($allProperties as $prop) {
             $byPropertyId[$prop->property_id] = $prop;
-            // Index by street number + street name fragment for fuzzy matching
             $addr = strtolower(trim(is_array($prop->address) ? json_encode($prop->address) : ($prop->address ?? '')));
             if (!empty($addr)) {
                 // Extract house number from address for matching
-                if (preg_match('/(\d+\s+[\w\s]+(?:ct|dr|ln|blvd|cir|st|ave|rd|way|pl))/i', $addr, $m)) {
+                if (preg_match($streetSuffixRegex, $addr, $m)) {
                     $byAddressFragment[strtolower(trim($m[1]))] = $prop;
                 }
                 $byAddressFragment[$addr] = $prop;
+
+                // Also index by just the house number for fallback
+                if (preg_match('/^(\d+)/', $addr, $m)) {
+                    $byHouseNumber[$m[1]] = $prop;
+                }
+            }
+            // Index by alternate identifiers from title (e.g., "20-202" for property 3032)
+            $title = strtolower($prop->title ?? '');
+            if (preg_match_all('/(\d+-\d+)/', $title, $m)) {
+                foreach ($m[1] as $alias) {
+                    $byAddressFragment[$alias] = $prop;
+                }
             }
         }
 
@@ -942,10 +957,21 @@ class BookervilleService
                         $propertyRecord = $byAddressFragment[$addrLower];
                     } else {
                         // Try extracting house number + street from the search address
-                        if (preg_match('/(\d+\s+[\w\s]+(?:ct|dr|ln|blvd|cir|st|ave|rd|way|pl))/i', $addrLower, $m)) {
+                        if (preg_match($streetSuffixRegex, $addrLower, $m)) {
                             $fragment = strtolower(trim($m[1]));
                             if (isset($byAddressFragment[$fragment])) {
                                 $propertyRecord = $byAddressFragment[$fragment];
+                            }
+                        }
+                    }
+                    // Strategy 2b: Match by just house number (handles alternate address formats like 20-202)
+                    if (!$propertyRecord) {
+                        if (preg_match('/^(\d+[-\d]*)/', $addrLower, $m)) {
+                            $houseNum = $m[1];
+                            if (isset($byAddressFragment[$houseNum])) {
+                                $propertyRecord = $byAddressFragment[$houseNum];
+                            } elseif (isset($byHouseNumber[$houseNum])) {
+                                $propertyRecord = $byHouseNumber[$houseNum];
                             }
                         }
                     }
