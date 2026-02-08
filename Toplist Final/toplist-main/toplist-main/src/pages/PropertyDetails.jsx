@@ -182,7 +182,7 @@ function PropertyDetails() {
   // Loading state
   if (loading) {
     return (
-      <div className="pt-20 bg-white">
+      <div className="pt-20 bg-dark-800 min-h-screen">
         <LoadingSpinner />
       </div>
     );
@@ -191,7 +191,7 @@ function PropertyDetails() {
   // Error state
   if (error || !property) {
     return (
-      <div className="pt-20 bg-white">
+      <div className="pt-20 bg-dark-800 min-h-screen">
         <ErrorMessage
           message={error || "Property not found"}
           onRetry={refetch}
@@ -199,7 +199,7 @@ function PropertyDetails() {
         <div className="flex justify-center mt-4">
           <Link
             to="/homes"
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-blue-400 hover:text-blue-300 underline"
           >
             Back to Properties
           </Link>
@@ -228,7 +228,7 @@ function PropertyDetails() {
   };
 
   return (
-    <div className="pt-20 bg-white">
+    <div className="pt-20 bg-dark-800 min-h-screen">
       {/* Image Carousel - Full width below navbar */}
       {propertyImages.length > 0 && (
         <div className="relative w-full h-[400px] overflow-hidden bg-gray-200">
@@ -387,41 +387,41 @@ function PropertyDetails() {
             {/* Property Title and Details */}
             <div className="mb-6">
               <div className="flex items-center mb-2">
-                <span className="bg-orange-500 text-white px-2 py-1 rounded text-sm font-medium">{getDisplayPrice()}/night</span>
+                <span className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium">{getDisplayPrice()}/night</span>
               </div>
-              <p className="text-sm text-gray-600 mb-1">
+              <p className="text-sm text-gray-400 mb-1">
                 {property.bedrooms && `${property.bedrooms} Bedrooms`}
-                {property.bathrooms && ` • ${property.bathrooms} Bathrooms`}
-                {property.max_guests && ` • ${property.max_guests} Guests`}
-                {property.category && ` • ${property.category}`}
+                {property.bathrooms && ` | ${property.bathrooms} Bathrooms`}
+                {property.max_guests && ` | ${property.max_guests} Guests`}
+                {property.category && ` | ${property.category}`}
               </p>
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              <h1 className="font-heading text-2xl font-bold text-white mb-4">
                 {property.title}
                 {getLocationString() && ` - ${getLocationString()}`}
               </h1>
               {property.description && (
-                <p className="text-gray-700 text-sm leading-relaxed">
+                <p className="text-gray-400 text-sm leading-relaxed">
                   {property.description}
                 </p>
               )}
               {property.description && (
-                <button className="text-orange-500 text-sm font-medium mt-2">Read More</button>
+                <button className="text-blue-400 text-sm font-medium mt-2 hover:text-blue-300">Read More</button>
               )}
             </div>
 
             {/* Dynamic Amenities Grid */}
             {property.amenities && property.amenities.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Amenities</h2>
+                <h2 className="font-heading text-xl font-semibold mb-4 text-white">Amenities</h2>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
                   {property.amenities.map((amenity, index) => (
-                    <div key={index} className="flex flex-col items-center p-3 border rounded-lg">
+                    <div key={index} className="flex flex-col items-center p-3 bg-dark-700 border border-dark-600 rounded-lg">
                       <div className="w-8 h-8 mb-2 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-pink-500" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41-1.41L9,16.17z"/>
                         </svg>
                       </div>
-                      <span className="text-xs text-center">{amenity}</span>
+                      <span className="text-xs text-center text-gray-300">{amenity}</span>
                     </div>
                   ))}
                 </div>
@@ -430,9 +430,9 @@ function PropertyDetails() {
 
             {/* Guest Reviews */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">Guest Reviews</h2>
+              <h2 className="font-heading text-xl font-semibold mb-4 text-white">Guest Reviews</h2>
               <div className="flex items-center mb-4">
-                <span className="text-2xl font-bold mr-2">5.0</span>
+                <span className="text-2xl font-bold mr-2 text-white">5.0</span>
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -440,16 +440,16 @@ function PropertyDetails() {
                     </svg>
                   ))}
                 </div>
-                <span className="text-gray-600 ml-2">31 reviews</span>
+                <span className="text-gray-400 ml-2">31 reviews</span>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
+                <div className="flex items-start space-x-3 bg-dark-700 p-4 rounded-lg">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-sm font-medium">A</span>
                   </div>
                   <div>
-                    <p className="font-medium">Anonymous Guest</p>
+                    <p className="font-medium text-white">Anonymous Guest</p>
                     <div className="flex text-yellow-400 text-sm">
                       {[...Array(5)].map((_, i) => (
                         <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -460,12 +460,12 @@ function PropertyDetails() {
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
+                <div className="flex items-start space-x-3 bg-dark-700 p-4 rounded-lg">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-sm font-medium">A</span>
                   </div>
                   <div>
-                    <p className="font-medium">Anonymous Guest</p>
+                    <p className="font-medium text-white">Anonymous Guest</p>
                     <div className="flex text-yellow-400 text-sm">
                       {[...Array(5)].map((_, i) => (
                         <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -481,23 +481,23 @@ function PropertyDetails() {
 
           {/* Right Column - Booking Info */}
           <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-200 rounded-lg p-6 sticky top-24">
-              <h3 className="text-lg font-semibold mb-4">Booking Information</h3>
+            <div className="bg-dark-700 border border-dark-600 rounded-lg p-6 sticky top-24">
+              <h3 className="font-heading text-lg font-semibold mb-4 text-white">Booking Information</h3>
 
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">Base Price:</span>
-                  <span>{getDisplayPrice()}/night</span>
+                  <span className="font-medium text-gray-300">Base Price:</span>
+                  <span className="text-white">{getDisplayPrice()}/night</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">Total per night:</span>
-                  <span className="font-bold">{getDisplayPrice()}</span>
+                  <span className="font-medium text-gray-300">Total per night:</span>
+                  <span className="font-bold text-white">{getDisplayPrice()}</span>
                 </div>
               </div>
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Select Dates</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-300">Select Dates</label>
                   <Flatpickr
                     options={{
                       mode: 'range',
@@ -507,21 +507,21 @@ function PropertyDetails() {
                     }}
                     onChange={(dates) => setSelectedDates(dates)}
                     placeholder="Select check-in - check-out"
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {availability.loading && (
                     <p className="text-xs text-gray-500 mt-1">Loading availability...</p>
                   )}
                   {selectedDates.length === 2 && (
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className="text-sm text-gray-400 mt-2">
                       {getNightsCount()} night{getNightsCount() !== 1 ? 's' : ''} selected
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Adults</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-300">Adults</label>
                   <select
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-3 bg-dark-800 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={guestCount}
                     onChange={(e) => setGuestCount(parseInt(e.target.value))}
                   >
@@ -534,9 +534,9 @@ function PropertyDetails() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Children</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-300">Children</label>
                   <select
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-3 bg-dark-800 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={childrenCount}
                     onChange={(e) => setChildrenCount(parseInt(e.target.value))}
                   >
@@ -550,12 +550,12 @@ function PropertyDetails() {
               </div>
 
               {/* Airbnb Redirect Notice */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-4">
                 <div className="flex items-start">
-                  <svg className="w-5 h-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-blue-400 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm text-blue-300">
                     <strong>Secure Booking:</strong> You will be redirected to Airbnb to complete your reservation securely.
                   </p>
                 </div>
@@ -565,16 +565,16 @@ function PropertyDetails() {
                 <button
                   onClick={handleBookNow}
                   disabled={bookingLoading}
-                  className="w-full bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {bookingLoading ? 'Preparing Booking...' : 'Book Now on Airbnb'}
                 </button>
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-600 mb-3">This property requires direct booking.</p>
+                  <p className="text-gray-400 mb-3">This property requires direct booking.</p>
                   <Link
                     to="/contact"
-                    className="w-full block bg-pink-500 text-white py-3 rounded-lg font-semibold hover:bg-pink-600 transition-colors text-center"
+                    className="w-full block bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center"
                   >
                     Contact Us to Book
                   </Link>

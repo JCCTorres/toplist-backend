@@ -65,7 +65,7 @@ function Navbar() {
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-transparent'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-dark-900 shadow-lg' : 'bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
@@ -81,20 +81,20 @@ function Navbar() {
           
           {/* Desktop menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
+            <Link
               to="/"
               onClick={() => scrollToSection('home')}
-              className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${isActive('/') 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : `${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}`}
+              className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium transition-colors duration-200 ${isActive('/')
+                ? 'text-blue-400 border-b-2 border-blue-400'
+                : 'text-gray-300 hover:text-white'}`}
             >
               Home
             </Link>
-            <button 
+            <button
               onClick={handlePropertiesClick}
-              className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${(isActive('/homes') || (location.pathname === '/' && false))
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : `${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}`}
+              className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium transition-colors duration-200 ${(isActive('/homes') || (location.pathname === '/' && false))
+                ? 'text-blue-400 border-b-2 border-blue-400'
+                : 'text-gray-300 hover:text-white'}`}
             >
               Properties
             </button>
@@ -102,19 +102,19 @@ function Navbar() {
               <>
                 <button
                   onClick={() => scrollToSection('services')}
-                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}
+                  className="inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200"
                 >
                   Add-ons
                 </button>
                 <button
                   onClick={() => scrollToSection('management')}
-                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}
+                  className="inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200"
                 >
                   Management
                 </button>
                 <button
                   onClick={() => scrollToSection('contact')}
-                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}
+                  className="inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200"
                 >
                   Contact
                 </button>
@@ -123,25 +123,25 @@ function Navbar() {
               <>
                 <Link
                   to="/services"
-                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${isActive('/services')
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : `${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}`}
+                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium transition-colors duration-200 ${isActive('/services')
+                    ? 'text-blue-400 border-b-2 border-blue-400'
+                    : 'text-gray-300 hover:text-white'}`}
                 >
                   Add-ons
                 </Link>
                 <Link
                   to="/management"
-                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${isActive('/management')
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : `${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}`}
+                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium transition-colors duration-200 ${isActive('/management')
+                    ? 'text-blue-400 border-b-2 border-blue-400'
+                    : 'text-gray-300 hover:text-white'}`}
                 >
                   Management
                 </Link>
                 <Link
                   to="/contact"
-                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium ${isActive('/contact')
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : `${scrolled ? 'text-gray-500' : 'text-white'} hover:text-blue-600`}`}
+                  className={`inline-flex items-center px-1 pt-3 pb-2 text-sm font-medium transition-colors duration-200 ${isActive('/contact')
+                    ? 'text-blue-400 border-b-2 border-blue-400'
+                    : 'text-gray-300 hover:text-white'}`}
                 >
                   Contact
                 </Link>
@@ -168,7 +168,7 @@ function Navbar() {
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`inline-flex items-center justify-center p-2 rounded-md ${scrolled ? 'text-gray-700' : 'text-white'} hover:text-blue-600 focus:outline-none`}
+              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-blue-400 focus:outline-none transition-colors duration-200"
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? (
@@ -185,39 +185,61 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu, show/hide based on menu state */}
-      {isOpen && (
-        <div className="md:hidden bg-white shadow-lg">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      {/* Mobile menu overlay */}
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setIsOpen(false)}
+      />
+
+      {/* Mobile slide-out drawer */}
+      <div
+        className={`fixed top-0 left-0 h-full w-72 bg-dark-900 z-50 md:hidden transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <div className="p-6">
+          {/* Close button */}
+          <div className="flex justify-between items-center mb-8">
+            <img src="/TopListLogo3.png" alt="Toplist Orlando" className="h-10" />
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Navigation links */}
+          <nav className="space-y-2">
             <Link
               to="/"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/') ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+              className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${isActive('/') ? 'bg-dark-700 text-blue-400' : 'text-gray-300 hover:bg-dark-800 hover:text-white'}`}
               onClick={() => scrollToSection('home')}
             >
               Home
             </Link>
             <button
               onClick={handlePropertiesClick}
-              className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${(isActive('/homes') || (location.pathname === '/' && false)) ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+              className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-colors ${(isActive('/homes') || (location.pathname === '/' && false)) ? 'bg-dark-700 text-blue-400' : 'text-gray-300 hover:bg-dark-800 hover:text-white'}`}
             >
               Properties
             </button>
             {location.pathname === '/' ? (
               <>
                 <button
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 w-full text-left"
+                  className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:bg-dark-800 hover:text-white transition-colors"
                   onClick={() => scrollToSection('services')}
                 >
                   Add-ons
                 </button>
                 <button
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 w-full text-left"
+                  className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:bg-dark-800 hover:text-white transition-colors"
                   onClick={() => scrollToSection('management')}
                 >
                   Management
                 </button>
                 <button
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 w-full text-left"
+                  className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:bg-dark-800 hover:text-white transition-colors"
                   onClick={() => scrollToSection('contact')}
                 >
                   Contact
@@ -227,44 +249,47 @@ function Navbar() {
               <>
                 <Link
                   to="/services"
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/services') ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                  className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${isActive('/services') ? 'bg-dark-700 text-blue-400' : 'text-gray-300 hover:bg-dark-800 hover:text-white'}`}
                   onClick={() => setIsOpen(false)}
                 >
                   Add-ons
                 </Link>
                 <Link
                   to="/management"
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/management') ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                  className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${isActive('/management') ? 'bg-dark-700 text-blue-400' : 'text-gray-300 hover:bg-dark-800 hover:text-white'}`}
                   onClick={() => setIsOpen(false)}
                 >
                   Management
                 </Link>
                 <Link
                   to="/contact"
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/contact') ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                  className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${isActive('/contact') ? 'bg-dark-700 text-blue-400' : 'text-gray-300 hover:bg-dark-800 hover:text-white'}`}
                   onClick={() => setIsOpen(false)}
                 >
                   Contact
                 </Link>
               </>
             )}
-            <Link
-              to="/guest"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/guest') ? 'bg-blue-100 text-blue-600' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-              onClick={() => setIsOpen(false)}
-            >
-              Guest
-            </Link>
-            <Link
-              to="/admin-login"
-              className="block px-3 py-2 bg-red-600 text-white rounded-md text-base font-medium hover:bg-red-700"
-              onClick={() => setIsOpen(false)}
-            >
-              Admin
-            </Link>
-          </div>
+
+            <div className="pt-4 mt-4 border-t border-dark-600 space-y-2">
+              <Link
+                to="/guest"
+                className="block px-4 py-3 bg-blue-600 text-white rounded-lg text-base font-medium hover:bg-blue-700 transition-colors text-center"
+                onClick={() => setIsOpen(false)}
+              >
+                Guest Portal
+              </Link>
+              <Link
+                to="/admin-login"
+                className="block px-4 py-3 bg-red-600 text-white rounded-lg text-base font-medium hover:bg-red-700 transition-colors text-center"
+                onClick={() => setIsOpen(false)}
+              >
+                Admin
+              </Link>
+            </div>
+          </nav>
         </div>
-      )}
+      </div>
     </nav>
   );
 }
