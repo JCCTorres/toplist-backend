@@ -1030,15 +1030,18 @@ class BookervilleService
             }
         }
 
-        // Ordenar resultados por preço crescente
-        //  usort($results, function ($a, $b) {
-        //     return $a['price'] <=> $b['price'];
-        // });
+        // Filter out unavailable properties - only return properties where bookingMessage === 'Ok'
+        $availableResults = array_filter($results, function ($property) {
+            return $property['is_available'] === true;
+        });
+
+        // Re-index array to ensure consecutive numeric keys
+        $availableResults = array_values($availableResults);
 
         return [
             'request' => $searchParams,
-            'results' => $results,
-            'total_results' => count($results),
+            'results' => $availableResults,
+            'total_results' => count($availableResults),
             'timestamp' => now()->toISOString()
         ];
     }
