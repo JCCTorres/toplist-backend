@@ -19,9 +19,9 @@ function AppContent() {
   const isHome = location.pathname === '/';
 
   return (
-    <div className={`flex flex-col ${isHome ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className={isHome ? 'flex-1 overflow-hidden' : 'flex-grow'}>
+      <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/homes" element={<Properties />} />
@@ -36,7 +36,7 @@ function AppContent() {
           <Route path="/property-details" element={<PropertyDetails />} />
         </Routes>
       </main>
-      {!isHome && <Footer />}
+      {isHome ? <SimpleFooter /> : <Footer />}
     </div>
   );
 }

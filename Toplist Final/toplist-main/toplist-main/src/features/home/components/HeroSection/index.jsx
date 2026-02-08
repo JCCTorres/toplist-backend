@@ -3,7 +3,7 @@ import SearchBar from './SearchBar';
 
 const HeroSection = ({ searchBarProps }) => {
   return (
-    <section id="home" className="relative h-screen hero-section flex flex-col overflow-hidden">
+    <section id="home" className="relative min-h-screen hero-section flex flex-col">
       {/* Video Background */}
       <div className="video-background">
         <video autoPlay muted loop playsInline className="fullscreen-video">
