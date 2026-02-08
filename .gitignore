@@ -21,3 +21,8 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Nested project copies (stale duplicates - not deployed)
+/Toplist Final/
+.planning/
+.playwright-mcp/
