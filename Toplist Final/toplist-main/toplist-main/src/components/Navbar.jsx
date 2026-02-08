@@ -48,18 +48,15 @@ function Navbar() {
           <div className="flex items-center">
             <div
               onClick={handleLogoClick}
-              className="flex-shrink-0 flex items-center gap-3 cursor-pointer group"
+              className="flex-shrink-0 flex items-center cursor-pointer group"
               role="button"
               aria-label="Go to homepage"
             >
               <img
-                className="h-11 w-auto transition-opacity duration-300 group-hover:opacity-80"
+                className="h-[70px] w-auto transition-opacity duration-300 group-hover:opacity-80"
                 src="/TopListLogo3.png"
                 alt="Toplist Orlando"
               />
-              <span className="hidden sm:block font-heading text-xl text-white tracking-wide transition-colors duration-300 group-hover:text-gold-400">
-                Toplist Orlando
-              </span>
             </div>
           </div>
 
@@ -87,24 +84,6 @@ function Navbar() {
               </Link>
             ))}
 
-            {/* Divider */}
-            <div className="w-px h-6 bg-white/10 mx-3" />
-
-            {/* Action buttons */}
-            <div className="flex items-center gap-2">
-              <Link
-                to="/guest"
-                className="inline-flex items-center px-4 py-2 border border-white/20 text-xs font-medium uppercase tracking-[0.15em] rounded text-sand-200/80 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all duration-300"
-              >
-                Guest
-              </Link>
-              <Link
-                to="/admin-login"
-                className="inline-flex items-center px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] rounded bg-gold-500 text-navy-950 hover:bg-gold-400 transition-all duration-300"
-              >
-                Admin
-              </Link>
-            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -159,22 +138,6 @@ function Navbar() {
               </Link>
             ))}
 
-            <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
-              <Link
-                to="/guest"
-                className="block px-4 py-3 border border-white/20 text-sand-200/80 rounded-lg text-sm font-medium uppercase tracking-[0.12em] hover:bg-white/5 hover:text-white transition-all duration-300 text-center"
-                onClick={() => setIsOpen(false)}
-              >
-                Guest Portal
-              </Link>
-              <Link
-                to="/admin-login"
-                className="block px-4 py-3 bg-gold-500 text-navy-950 rounded-lg text-sm font-medium uppercase tracking-[0.12em] hover:bg-gold-400 transition-all duration-300 text-center"
-                onClick={() => setIsOpen(false)}
-              >
-                Admin
-              </Link>
-            </div>
           </nav>
         </div>
       </div>

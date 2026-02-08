@@ -20,7 +20,7 @@ const SearchBar = ({
   selectResort
 }) => {
   return (
-    <div className="glass rounded-xl shadow-2xl flex flex-col md:flex-row gap-3 p-3">
+    <div className="rounded-xl shadow-2xl flex flex-col md:flex-row gap-3 p-3 bg-navy-950/80 backdrop-blur-xl border border-white/10">
       {/* Travel Dates with calendar */}
       <div className="search-bar-section travel-dates bg-white/10 border border-white/20 text-white py-4 px-6 font-semibold flex-1 rounded-lg flex items-center gap-3">
         <svg className="w-5 h-5 text-gold-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@ const SearchBar = ({
       </div>
 
       <button
-        className="search-bar-section search-btn bg-gold-500 text-navy-950 py-4 px-8 font-semibold flex-1 hover:bg-gold-400 transition-colors rounded-lg"
+        className="search-bar-section search-btn bg-navy-900 text-gold-400 py-4 px-8 font-semibold flex-1 hover:bg-navy-800 transition-colors rounded-lg border border-gold-500/30"
         onClick={handleSearch}
       >
         Search
