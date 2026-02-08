@@ -15,7 +15,7 @@ const PropertyCard = ({ property, searchParams }) => {
       <div className="relative h-64 overflow-hidden bg-navy-900">
         {image ? (
           <>
-            <img src={image} alt={title} className="card-img w-full h-full object-cover" />
+            <img src={image} alt={title} className="card-img absolute inset-0 w-full h-full object-cover" />
             {/* Gradient overlay for text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           </>
