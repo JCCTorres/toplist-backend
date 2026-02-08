@@ -6,17 +6,21 @@ const PropertyCard = ({ property }) => {
   const image = property.image || property.main_image;
   const city = property.city;
 
-  // Parse guests string from API (e.g. "6 guests • 2 beds • 2 baths")
+  // Parse guests string from API (e.g. "6 guests . 2 beds . 2 baths")
   const guestsStr = property.guests || '';
   const hasStructuredDetails = property.bedrooms || property.bathrooms || property.max_guests;
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl flex flex-col h-full min-h-[450px] transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-      <div className="relative h-64 overflow-hidden bg-gray-100">
+    <div className="card-hover bg-white rounded-2xl overflow-hidden flex flex-col h-full border border-sand-200/60 shadow-sm">
+      <div className="relative h-64 overflow-hidden bg-sand-100">
         {image ? (
-          <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+          <>
+            <img src={image} alt={title} className="card-img w-full h-full object-cover" />
+            {/* Gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
+          <div className="w-full h-full flex items-center justify-center text-navy-800/30">
             <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
           </div>
         )}
@@ -25,35 +29,35 @@ const PropertyCard = ({ property }) => {
         <h3 className="font-heading text-lg font-semibold text-navy-900 mb-2">{title}</h3>
 
         {hasStructuredDetails ? (
-          <div className="flex items-center gap-4 text-gray-500 mb-3 text-sm">
+          <div className="flex items-center gap-4 text-navy-800/60 mb-3 text-sm">
             {property.bedrooms > 0 && (
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                 {property.bedrooms} Bed
               </span>
             )}
             {property.bathrooms > 0 && (
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>
                 {property.bathrooms} Bath
               </span>
             )}
             {property.max_guests > 0 && (
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                 {property.max_guests} Guests
               </span>
             )}
           </div>
         ) : guestsStr && (
-          <div className="text-gray-500 mb-3 text-sm">
+          <div className="text-navy-800/60 mb-3 text-sm">
             {guestsStr}
           </div>
         )}
 
         {city && (
-          <div className="text-gray-400 mb-3 text-sm flex items-center gap-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <div className="text-xs uppercase tracking-wider text-navy-800/40 mb-4 flex items-center gap-1.5">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             {city}
           </div>
         )}
@@ -61,7 +65,7 @@ const PropertyCard = ({ property }) => {
         <div className="mt-auto">
           <Link
             to={`/property-details/${property.id}`}
-            className="block w-full text-center bg-blue-600 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            className="block w-full text-center bg-navy-900 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-navy-800 transition-colors"
           >
             View Details
           </Link>

@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 function Footer() {
   return (
-    <footer className="bg-dark-900 text-white">
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-navy-950 border-t border-white/5 text-white">
+      <div className="max-w-7xl mx-auto py-14 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* About Us Column */}
           <div>
             <img
@@ -13,32 +13,33 @@ function Footer() {
               alt="Toplist Orlando"
               className="h-10 mb-4 opacity-90"
             />
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <h2 className="font-heading text-xl text-white mb-3">Toplist Orlando</h2>
+            <p className="text-white/50 text-sm leading-relaxed font-sans">
               Toplist Orlando provides premium vacation rental and property management services in Orlando, Florida. Your dream vacation starts here.
             </p>
           </div>
 
           {/* Quick Links Column */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-4 text-white">Quick Links</h3>
+            <h3 className="uppercase text-xs tracking-[0.15em] font-sans font-medium text-gold-400 mb-4">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/homes" className="text-gray-400 hover:text-white transition-colors duration-200">
+                <Link to="/homes" className="text-white/50 hover:text-white transition-colors text-sm font-sans">
                   Properties
                 </Link>
               </li>
               <li>
-                <Link to="/services" className="text-gray-400 hover:text-white transition-colors duration-200">
+                <Link to="/services" className="text-white/50 hover:text-white transition-colors text-sm font-sans">
                   Add-ons
                 </Link>
               </li>
               <li>
-                <Link to="/management" className="text-gray-400 hover:text-white transition-colors duration-200">
+                <Link to="/management" className="text-white/50 hover:text-white transition-colors text-sm font-sans">
                   Management
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-white transition-colors duration-200">
+                <Link to="/contact" className="text-white/50 hover:text-white transition-colors text-sm font-sans">
                   Contact
                 </Link>
               </li>
@@ -47,24 +48,24 @@ function Footer() {
 
           {/* Contact Info Column */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-4 text-white">Contact Info</h3>
-            <ul className="space-y-3 text-gray-400 text-sm">
+            <h3 className="uppercase text-xs tracking-[0.15em] font-sans font-medium text-gold-400 mb-4">Contact Info</h3>
+            <ul className="space-y-3 text-white/50 text-sm font-sans">
               <li className="flex items-start">
-                <svg className="w-5 h-5 mr-2 mt-0.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg className="w-4 h-4 mr-2.5 mt-0.5 text-gold-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 <span>info@toplistorlando.com</span>
               </li>
               <li className="flex items-start">
-                <svg className="w-5 h-5 mr-2 mt-0.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                <svg className="w-4 h-4 mr-2.5 mt-0.5 text-gold-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
                 <span>(123) 456-7890</span>
               </li>
               <li className="flex items-start">
-                <svg className="w-5 h-5 mr-2 mt-0.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg className="w-4 h-4 mr-2.5 mt-0.5 text-gold-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span>Orlando, FL</span>
               </li>
@@ -73,14 +74,14 @@ function Footer() {
 
           {/* Follow Us Column */}
           <div>
-            <h3 className="font-heading text-lg font-semibold mb-4 text-white">Follow Us</h3>
-            <p className="text-gray-400 text-sm mb-4">Stay connected with us on social media for the latest updates and vacation inspiration.</p>
-            <div className="flex space-x-4">
+            <h3 className="uppercase text-xs tracking-[0.15em] font-sans font-medium text-gold-400 mb-4">Follow Us</h3>
+            <p className="text-white/50 text-sm mb-5 font-sans leading-relaxed">Stay connected with us on social media for the latest updates and vacation inspiration.</p>
+            <div className="flex space-x-3">
               <a
                 href="https://www.instagram.com/toplistvacationrentals/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-dark-700 hover:bg-dark-600 text-gray-400 hover:text-white p-3 rounded-full transition-all duration-200"
+                className="text-white/40 hover:text-gold-400 p-2.5 rounded-full border border-white/10 hover:border-gold-400/30 transition-all duration-300"
               >
                 <span className="sr-only">Instagram</span>
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -92,16 +93,16 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 border-t border-dark-600 pt-8">
+        <div className="mt-12 border-t border-white/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 text-sm">
+            <p className="text-white/30 text-xs font-sans">
               &copy; {new Date().getFullYear()} Toplist Orlando. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-500 hover:text-gray-400 text-sm transition-colors duration-200">
+              <a href="#" className="text-white/30 hover:text-white/50 text-xs font-sans transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-gray-500 hover:text-gray-400 text-sm transition-colors duration-200">
+              <a href="#" className="text-white/30 hover:text-white/50 text-xs font-sans transition-colors">
                 Terms of Service
               </a>
             </div>
@@ -112,4 +113,4 @@ function Footer() {
   );
 }
 
-export default Footer; 
+export default Footer;
