@@ -6,7 +6,7 @@ function Home() {
   const searchBarProps = useSearchFilters();
 
   return (
-    <div className="font-sans">
+    <div className="font-sans h-full">
       <HeroSection searchBarProps={searchBarProps} />
     </div>
   );

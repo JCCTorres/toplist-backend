@@ -43,7 +43,7 @@ function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-28">
+        <div className="flex justify-between items-center h-16 md:h-28">
           {/* Logo */}
           <div className="flex items-center">
             <div
@@ -53,7 +53,7 @@ function Navbar() {
               aria-label="Go to homepage"
             >
               <img
-                className="h-24 w-auto transition-opacity duration-300 group-hover:opacity-80"
+                className="h-12 md:h-24 w-auto transition-opacity duration-300 group-hover:opacity-80"
                 src="/TopListLogo3.png"
                 alt="Toplist Orlando"
               />
