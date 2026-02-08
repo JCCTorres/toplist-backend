@@ -5,23 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Guests can browse available properties, check real-time availability via Bookerville, and seamlessly proceed to book through Airbnb
-**Current focus:** Phase 2 Complete - Ready for Phase 3
+**Current focus:** Phase 3 - Executing Plan 03-02 (Deployment)
 
 ## Current Position
 
-Phase: 2 of 3 (Search, Availability & Booking Flow)
-Plan: 2 of 2 in current phase
-Status: Phase 2 Complete
-Last activity: 2026-02-07 - Completed 02-02-PLAN.md (Booking flow and email forms)
+Phase: 3 of 3 (Design Polish & Deployment)
+Plan: 1 of 2 complete in current phase
+Status: Executing 03-02
+Last activity: 2026-02-08 - Completed 03-01-PLAN.md (Design polish, dark theme, dual footer)
 
-Progress: [########..] 80% (4/5 plans)
+Progress: [█████████░] 83% (5/6 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~4 minutes
-- Total execution time: ~17 minutes
+- Total plans completed: 5
+- Total execution time: ~37 minutes
 
 **By Phase:**
 
@@ -29,10 +28,7 @@ Progress: [########..] 80% (4/5 plans)
 |-------|-------|-------|----------|
 | 01 | 2/2 | ~9 min | ~4.5 min |
 | 02 | 2/2 | ~8 min | ~4 min |
-
-**Recent Trend:**
-- Last 5 plans: 01-01 (~5 min), 01-02 (~4 min), 02-01 (~3 min), 02-02 (~5 min)
-- Trend: Stable
+| 03 | 1/2 | ~20 min | ~20 min |
 
 *Updated after each plan completion*
 
@@ -40,24 +36,21 @@ Progress: [########..] 80% (4/5 plans)
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
 - [Roadmap]: Quick depth (3 phases) to ship today
 - [Roadmap]: Same-origin serving (Laravel serves React build) to avoid CORS
 - [01-01]: Native fetch over axios/react-query
-- [01-01]: Simple spinner over skeleton cards
-- [01-01]: Conditional field rendering for API data
 - [01-02]: Parallel API fetches for details and availability
-- [01-02]: Graceful degradation for availability errors
-- [01-02]: Placeholder image fallback for missing photos
 - [02-01]: URL params for search state (shareable links)
-- [02-01]: Conditional fetch based on URL presence
-- [02-01]: Children mapped from houseName field
 - [02-02]: Airbnb notice above Book Now for clear UX messaging
 - [02-02]: Separate Adults/Children selects instead of combined Total Guests
-- [02-02]: Contact fallback link for properties without airbnb_id
-- [02-02]: Optional message field added to management form
+- [03-01]: Starfield canvas animation for dark theme ambiance
+- [03-01]: Montserrat headings + Poppins body via Google Fonts CDN
+- [03-01]: Dark palette dark-900 through dark-600 in Tailwind config
+- [03-01]: SimpleFooter on Home, FullFooter with 4-column grid on other pages
+- [03-01]: Resorts removed from nav and Home (files kept for rollback)
+- [03-01]: Legacy HTML files moved to _legacy/ to prevent SPA routing conflicts
 
 ### Pending Todos
 
@@ -65,13 +58,12 @@ None.
 
 ### Blockers/Concerns
 
-From research/SUMMARY.md:
-- Exposed API credentials in .env.example (security - address in Phase 3)
-- CORS wildcard in config/cors.php (security - address in Phase 3)
+- Exposed API credentials in .env.example (security - address in 03-02)
+- CORS wildcard in config/cors.php (security - address in deployment)
 - Verify PHP 8.0+ on production server for XXE protection
 
 ## Session Continuity
 
-Last session: 2026-02-07
-Stopped at: Completed Phase 2 (both plans 02-01 and 02-02)
-Resume file: Ready for Phase 3 planning
+Last session: 2026-02-08
+Stopped at: Completed 03-01 (Design polish), starting 03-02 (Deployment)
+Resume file: None
