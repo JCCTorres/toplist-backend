@@ -1,15 +1,17 @@
-# TopList Orlando Deployment Guide
+# TopList Orlando Deployment Guide (Railway)
 
 ## Overview
 
-This guide walks you through deploying the TopList Orlando vacation rental website. The application consists of two parts:
+This guide walks you through deploying the TopList Orlando vacation rental website using **Railway**, a modern cloud platform that makes deployment simple.
 
-1. **React Frontend** - The user-facing website (what visitors see)
-2. **Laravel Backend** - The API server (handles data and business logic)
+The application consists of two parts:
 
-**Architecture:** Laravel serves both the API and the React frontend. The React app is built into static files and placed in Laravel's `public/` directory. This "same-origin" setup simplifies deployment and avoids CORS issues.
+1. **React Frontend** — The user-facing website (what visitors see)
+2. **Laravel Backend** — The API server (handles data, Bookerville integration, and email)
 
-**Hosting:** We use Cloudways, a managed cloud hosting platform that handles server maintenance, security updates, and backups.
+**Architecture:** Laravel serves both the API and the React frontend from the same domain. The React app is built into static files and placed in Laravel's `public/` directory. This "same-origin" setup avoids CORS issues.
+
+**Why Railway:** Instant account creation, git-push deploys, built-in database, environment variable management, and free tier to start.
 
 ---
 
@@ -17,293 +19,290 @@ This guide walks you through deploying the TopList Orlando vacation rental websi
 
 Before starting, ensure you have:
 
-- [ ] Access to the project code (GitHub repository or local files)
-- [ ] A Cloudways account (we'll create one if needed)
-- [ ] A domain name (optional but recommended)
-- [ ] The Laravel API credentials and Bookerville API keys
-- [ ] About 30-60 minutes for the initial setup
+- [ ] A **GitHub account** (free — [github.com](https://github.com))
+- [ ] The project code uploaded to a **GitHub repository** (or ready to upload)
+- [ ] Your **Bookerville API credentials** (API key, account/client ID)
+- [ ] Your **SMTP email credentials** (for contact forms — Gmail app password works)
+- [ ] A **domain name** (optional but recommended)
+- [ ] About 30–45 minutes for the initial setup
 
 ---
 
-## Step 1: Create Cloudways Account and Server
+## Step 1: Create a Railway Account
 
-### 1.1 Create Account
+1. Go to [railway.app](https://railway.app)
+2. Click **"Login"** → **"Login with GitHub"**
+3. Authorize Railway to access your GitHub account
+4. You're in — no verification wait, no credit card required for the free tier
 
-1. Go to [cloudways.com](https://www.cloudways.com)
-2. Click "Start Free" or "Sign Up"
-3. Fill in your details and verify your email
-4. Add a payment method (they offer a free trial)
-
-### 1.2 Create a Server
-
-1. In the Cloudways dashboard, click "Launch" or "Add Server"
-2. Choose these settings:
-   - **Application:** PHP (Laravel)
-   - **Server Size:** Start with 1GB RAM ($11/month) - you can upgrade later
-   - **Cloud Provider:** DigitalOcean (recommended for cost)
-   - **Server Location:** Choose closest to your users (e.g., Miami for Orlando guests)
-3. Click "Launch Now" and wait 5-10 minutes for provisioning
-
-### 1.3 Note Your Credentials
-
-After the server is ready, Cloudways provides:
-- **Server IP Address:** (e.g., 167.99.225.xxx)
-- **SSH/SFTP Username:** (usually "master")
-- **SSH/SFTP Password:** (copy and save this securely)
-- **MySQL Credentials:** (database name, user, password)
-
-Save all these credentials securely - you'll need them!
+> **Free tier:** 500 hours/month, 512 MB RAM, 1 GB disk. Enough for a small site.
+> **Pro plan:** $5/month — unlimited hours, more resources. Recommended for production.
 
 ---
 
-## Step 2: Create Laravel Application
+## Step 2: Prepare the Code for Deployment
 
-### 2.1 Add Application
+### 2.1 Push Laravel Backend to GitHub
 
-1. In Cloudways, click your server, then "Applications"
-2. Click "Add Application"
-3. Select "PHP" as the application type
-4. Choose a name (e.g., "toplist-orlando")
-5. Click "Add Application"
+If the `control_toplist-homolog` folder isn't already in a GitHub repository:
 
-### 2.2 Access Application Details
-
-1. Click on your new application
-2. Note the "Application URL" (temporary Cloudways URL)
-3. Go to "Access Details" tab - save:
-   - Application path (e.g., `/home/master/applications/toplist-orlando/public_html`)
-   - Database name, user, and password
-
----
-
-## Step 3: Upload Code to Server
-
-### 3.1 Connect via SFTP
-
-1. Download and install [FileZilla](https://filezilla-project.org/) (free SFTP client)
-2. Open FileZilla and enter:
-   - **Host:** Your server IP (sftp://167.99.225.xxx)
-   - **Username:** Your SSH username
-   - **Password:** Your SSH password
-   - **Port:** 22
-3. Click "Quickconnect"
-
-### 3.2 Upload Laravel Backend
-
-1. Navigate to the application folder: `applications/your-app-name/public_html/`
-2. Delete any existing files (default Laravel installation)
-3. On your local computer, find the `control_toplist-homolog` folder
-4. Upload ALL contents of `control_toplist-homolog` to `public_html/`
-5. Wait for upload to complete (may take 10-20 minutes)
-
-### 3.3 Set Permissions
-
-Connect via SSH (Cloudways provides SSH access in the dashboard) and run:
+1. Create a new repository on GitHub (e.g., `toplist-backend`)
+2. On your computer, open a terminal in the `control_toplist-homolog` folder
+3. Run:
 
 ```bash
-cd ~/applications/your-app-name/public_html
-chmod -R 755 storage
-chmod -R 755 bootstrap/cache
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/toplist-backend.git
+git push -u origin main
 ```
+
+### 2.2 Build the React Frontend
+
+On your computer, in the `toplist-main` folder:
+
+```bash
+npm install          # Install dependencies (first time only)
+npm run build        # Creates the dist/ folder
+```
+
+### 2.3 Copy React Build into Laravel
+
+Copy the contents of `toplist-main/dist/` into `control_toplist-homolog/public/`:
+
+- Copy `dist/index.html` → `control_toplist-homolog/public/index.html`
+- Copy `dist/assets/` → `control_toplist-homolog/public/assets/`
+
+Then commit and push:
+
+```bash
+cd control_toplist-homolog
+git add public/index.html public/assets/
+git commit -m "Add React production build"
+git push
+```
+
+---
+
+## Step 3: Deploy Laravel on Railway
+
+### 3.1 Create a New Project
+
+1. In Railway dashboard, click **"New Project"**
+2. Select **"Deploy from GitHub repo"**
+3. Choose your `toplist-backend` repository
+4. Railway will auto-detect it as a PHP/Laravel application
+
+### 3.2 Add a MySQL Database
+
+1. In your project, click **"New"** → **"Database"** → **"MySQL"**
+2. Railway creates the database instantly
+3. Click on the MySQL service to see connection details
+
+### 3.3 Connect Laravel to the Database
+
+1. Click on your Laravel service
+2. Go to **"Variables"** tab
+3. Click **"New Variable"** and add a **"Reference"** to the MySQL service:
+   - Click **"Add Reference"** → select your MySQL service
+   - This auto-creates `DATABASE_URL`, `MYSQLHOST`, `MYSQLPORT`, etc.
 
 ---
 
 ## Step 4: Configure Environment Variables
 
-### 4.1 Create .env File
+In your Laravel service → **"Variables"** tab, add these one by one:
 
-1. In FileZilla, navigate to `public_html/`
-2. Find the `.env.example` file
-3. Download it to your computer
-4. Rename it to `.env`
-5. Edit it with your actual values (see below)
-6. Upload the `.env` file back to `public_html/`
+### Required Variables
 
-### 4.2 Required Environment Variables
+| Variable | Value | Where to Get It |
+|----------|-------|-----------------|
+| `APP_NAME` | `TopList Orlando` | Just type it |
+| `APP_ENV` | `production` | Just type it |
+| `APP_DEBUG` | `false` | Just type it |
+| `APP_URL` | `https://your-railway-url.up.railway.app` | From Railway service URL (update later with custom domain) |
+| `APP_KEY` | *(see below)* | Auto-generated |
 
-Edit your `.env` file with these values:
+### Database Variables
 
-```env
-# Application Settings
-APP_NAME="TopList Orlando"
-APP_ENV=production
-APP_KEY=base64:GENERATE_THIS_KEY
-APP_DEBUG=false
-APP_URL=https://your-domain.com
+If Railway auto-created these via reference, skip them. Otherwise add manually:
 
-# Database (from Cloudways Application details)
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=your_database_name
-DB_USERNAME=your_database_user
-DB_PASSWORD=your_database_password
+| Variable | Value | Where to Get It |
+|----------|-------|-----------------|
+| `DB_CONNECTION` | `mysql` | Just type it |
+| `DB_HOST` | *(from MySQL service)* | Railway MySQL → Connect tab |
+| `DB_PORT` | *(from MySQL service)* | Railway MySQL → Connect tab |
+| `DB_DATABASE` | *(from MySQL service)* | Railway MySQL → Connect tab |
+| `DB_USERNAME` | *(from MySQL service)* | Railway MySQL → Connect tab |
+| `DB_PASSWORD` | *(from MySQL service)* | Railway MySQL → Connect tab |
 
-# Bookerville API Configuration
-BOOKERVILLE_API_KEY=your_bookerville_api_key
-BOOKERVILLE_API_URL=https://app.bookerville.com/api/v2
-BOOKERVILLE_CLIENT_ID=your_client_id
+### Bookerville API
 
-# Mail Configuration (for contact forms)
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=no-reply@your-domain.com
-MAIL_FROM_NAME="TopList Orlando"
-```
+| Variable | Value | Where to Get It |
+|----------|-------|-----------------|
+| `BOOKERVILLE_API_KEY` | `your_api_key` | From your existing `.env` file or Bookerville dashboard |
+| `BOOKERVILLE_API_URL` | `https://app.bookerville.com/api/v2` | Standard Bookerville URL |
+| `BOOKERVILLE_CLIENT_ID` | `your_client_id` | From your existing `.env` file |
+| `BOOKERVILLE_ACCOUNT_ID` | `your_account_id` | From your existing `.env` file |
 
-### 4.3 Generate Application Key
+### Email (for Contact/Management forms)
 
-Connect via SSH and run:
+| Variable | Value | Where to Get It |
+|----------|-------|-----------------|
+| `MAIL_MAILER` | `smtp` | Just type it |
+| `MAIL_HOST` | `smtp.gmail.com` | Or your email provider's SMTP |
+| `MAIL_PORT` | `587` | Standard for TLS |
+| `MAIL_USERNAME` | `your_email@gmail.com` | Your email address |
+| `MAIL_PASSWORD` | `your_app_password` | Gmail: Settings → Security → App Passwords |
+| `MAIL_ENCRYPTION` | `tls` | Just type it |
+| `MAIL_FROM_ADDRESS` | `no-reply@your-domain.com` | Your preferred sender address |
+| `MAIL_FROM_NAME` | `TopList Orlando` | Just type it |
+
+### Generate APP_KEY
+
+After adding all variables, you need to generate a Laravel application key:
+
+**Option A (easiest):** In Railway, go to your service → **"Settings"** → scroll to **"Deploy"** section. Open the Railway CLI or use the built-in terminal. Run:
 
 ```bash
-cd ~/applications/your-app-name/public_html
-php artisan key:generate
+php artisan key:generate --show
 ```
 
-This automatically updates your `.env` file with a secure key.
+Copy the output (starts with `base64:...`) and paste it as the `APP_KEY` variable.
 
-### 4.4 Environment Variables Explained
+**Option B:** On your local computer (in the Laravel folder):
 
-| Variable | Description |
-|----------|-------------|
-| APP_KEY | Security key for encryption (auto-generated) |
-| APP_DEBUG | Set to `false` in production (hides errors from users) |
-| APP_URL | Your public domain (with https://) |
-| DB_* | Database credentials from Cloudways |
-| BOOKERVILLE_* | API credentials from Bookerville dashboard |
-| MAIL_* | Email service for sending contact form messages |
+```bash
+php artisan key:generate --show
+```
+
+Copy the output and add it as `APP_KEY` in Railway.
 
 ---
 
-## Step 5: Build and Deploy React Frontend
+## Step 5: Configure Laravel to Serve React
 
-### 5.1 Build the React App Locally
+### 5.1 Add Catch-All Route
 
-On your local computer:
-
-1. Open a terminal/command prompt
-2. Navigate to the `toplist-main` folder
-3. Run these commands:
-
-```bash
-npm install          # Install dependencies (first time only)
-npm run build        # Create production build
-```
-
-4. This creates a `dist/` folder with the built files
-
-### 5.2 Upload Built Files to Laravel
-
-1. In FileZilla, navigate to `public_html/public/`
-2. Upload the entire contents of your local `dist/` folder
-3. The structure should look like:
-   ```
-   public_html/
-     public/
-       index.html
-       assets/
-       images/
-       ...
-   ```
-
-### 5.3 Configure Index File
-
-If your `index.html` ends up in `public/`, rename it or adjust Laravel's routing to serve it (see Step 6).
-
----
-
-## Step 6: Configure Laravel to Serve React
-
-### 6.1 Create Catch-All Route
-
-Laravel needs to serve the React app for all non-API routes.
-
-1. Edit `routes/web.php` and add at the end:
+Edit `routes/web.php` in your repository. Add at the **end** of the file:
 
 ```php
 // Serve React app for all non-API routes
 Route::get('/{any}', function () {
     return file_get_contents(public_path('index.html'));
-})->where('any', '.*');
+})->where('any', '(?!api).*');
 ```
 
-2. Save and upload the file
-
-### 6.2 Clear Laravel Cache
-
-Connect via SSH and run:
+Commit and push:
 
 ```bash
-cd ~/applications/your-app-name/public_html
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+git add routes/web.php
+git commit -m "Add catch-all route for React SPA"
+git push
 ```
+
+Railway will auto-deploy when you push.
+
+### 5.2 Create Nixpacks Configuration (if needed)
+
+If Railway doesn't auto-detect PHP correctly, create a `nixpacks.toml` in the project root:
+
+```toml
+[phases.setup]
+nixPkgs = ["php83", "php83Extensions.pdo_mysql", "php83Extensions.mbstring", "php83Extensions.xml", "php83Extensions.curl"]
+
+[phases.install]
+cmds = ["composer install --no-dev --optimize-autoloader"]
+
+[start]
+cmd = "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php -S 0.0.0.0:$PORT -t public"
+```
+
+Commit and push this file.
 
 ---
 
-## Step 7: Point Domain and Enable SSL
+## Step 6: Run Database Migrations
 
-### 7.1 Add Domain in Cloudways
+In Railway, open the service terminal (or use Railway CLI):
 
-1. In Cloudways, go to your Application > Domain Management
-2. Click "Add Domain"
+```bash
+php artisan migrate --force
+```
+
+This creates the necessary database tables.
+
+---
+
+## Step 7: Point Your Domain (Optional)
+
+### 7.1 Get Railway URL
+
+Your app is already live at a Railway-generated URL like:
+`https://toplist-backend-production.up.railway.app`
+
+Test it first before adding a custom domain.
+
+### 7.2 Add Custom Domain
+
+1. In Railway, click your service → **"Settings"** → **"Networking"**
+2. Click **"Generate Domain"** (if you don't have one yet) or **"Custom Domain"**
 3. Enter your domain (e.g., `toplistorlando.com`)
-4. Also add `www.toplistorlando.com`
+4. Railway shows you the DNS records to add
 
-### 7.2 Update DNS Settings
+### 7.3 Update DNS
 
 At your domain registrar (GoDaddy, Namecheap, etc.):
 
 1. Go to DNS settings
-2. Create/update an A record:
-   - **Type:** A
-   - **Name:** @ (or leave blank)
-   - **Value:** Your Cloudways server IP
-   - **TTL:** 3600 (or default)
-3. Create another A record for www:
-   - **Type:** A
-   - **Name:** www
-   - **Value:** Your Cloudways server IP
+2. Add a **CNAME record**:
+   - **Name:** `@` or leave blank (for root domain)
+   - **Value:** The Railway-provided CNAME target
+   - **TTL:** 3600
+3. For `www`:
+   - **Name:** `www`
+   - **Value:** Same Railway CNAME target
 
-4. Wait for DNS propagation (can take up to 48 hours, usually 1-2 hours)
+4. Wait for DNS propagation (usually 1–2 hours, can take up to 48h)
 
-### 7.3 Enable Free SSL
+### 7.4 Enable SSL
 
-1. In Cloudways, go to your Application > SSL Certificate
-2. Click "Let's Encrypt"
-3. Enter your domain and email
-4. Click "Install Certificate"
-5. Enable "Force HTTPS Redirect"
+Railway provides **free SSL automatically** for custom domains. No action needed — it activates once DNS propagates.
+
+### 7.5 Update APP_URL
+
+After your domain is working, update the `APP_URL` environment variable in Railway to `https://your-domain.com`.
 
 ---
 
 ## Step 8: Verify Deployment
 
-### 8.1 Checklist
+### Quick Checklist
 
-Test each of these:
+Test each of these on your live site:
 
 - [ ] **Homepage loads:** Visit your domain, see the hero section with search bar
-- [ ] **Properties page:** Click "View All Properties", see property cards
-- [ ] **Property details:** Click a property, see details, images, calendar
-- [ ] **Search works:** Use search bar, results appear
-- [ ] **Date picker:** Select dates on property details, unavailable dates blocked
-- [ ] **Contact form:** Submit a test message
-- [ ] **Mobile view:** Test on phone or resize browser
-- [ ] **SSL working:** Check for padlock icon in browser
+- [ ] **Properties page:** Navigate to /homes, see property cards with real data
+- [ ] **Property details:** Click a property, see images, description, calendar
+- [ ] **Search works:** Enter dates in search bar, results filter correctly
+- [ ] **Date picker:** Select dates on property detail, unavailable dates are blocked
+- [ ] **Book Now:** Click Book Now, redirects to Airbnb (or shows Contact fallback)
+- [ ] **Contact form:** Submit a test message, check your email
+- [ ] **Management form:** Submit a test inquiry
+- [ ] **Mobile view:** Test on your phone or resize browser window
+- [ ] **SSL working:** Check for padlock icon in browser address bar
+- [ ] **No Resorts:** Confirm Resorts is not in navigation
 
-### 8.2 Quick Tests
+### Quick Test URLs
 
 ```
-https://your-domain.com                  # Homepage
-https://your-domain.com/properties       # Properties listing
-https://your-domain.com/properties/123   # Property details
-https://your-domain.com/api/properties   # API endpoint (should return JSON)
+https://your-domain.com                    # Homepage
+https://your-domain.com/homes              # Properties listing
+https://your-domain.com/property-details/1 # Property details
+https://your-domain.com/services           # Services page
+https://your-domain.com/contact            # Contact page
 ```
 
 ---
@@ -312,51 +311,60 @@ https://your-domain.com/api/properties   # API endpoint (should return JSON)
 
 ### "500 Internal Server Error"
 
-1. Check Laravel logs: `storage/logs/laravel.log`
-2. Ensure `.env` file exists with correct values
-3. Verify file permissions on `storage/` and `bootstrap/cache/`
-4. Run: `php artisan config:clear`
+1. In Railway, click your service → **"Deployments"** → click latest → check **logs**
+2. Common causes:
+   - Missing `.env` variables (especially `APP_KEY`)
+   - Database connection failed (check DB variables)
+   - Missing PHP extensions
+3. Fix: Add missing variables, redeploy
 
 ### "Page Not Found" for React routes
 
-1. Ensure the catch-all route is in `routes/web.php`
-2. Clear route cache: `php artisan route:clear`
-3. Verify `index.html` is in `public/` directory
+1. Ensure catch-all route is in `routes/web.php`
+2. Verify `index.html` is in `public/` directory
+3. Redeploy: push any commit to trigger rebuild
 
 ### "CORS Error" in browser console
 
-1. Check that React is served from same domain as API
-2. Verify `APP_URL` in `.env` matches your domain
-3. Clear browser cache and try again
+1. Since we use same-origin serving, this shouldn't happen
+2. If it does: verify `APP_URL` matches your actual domain
+3. Check `config/cors.php` — set `allowed_origins` to your domain
 
 ### "Cannot connect to database"
 
-1. Verify database credentials in `.env`
-2. Check database server is running in Cloudways
-3. Ensure DB_HOST is `127.0.0.1` (not `localhost` on some servers)
+1. Check MySQL service is running in Railway dashboard
+2. Verify DB variables match what Railway provides
+3. Try using the `DATABASE_URL` variable instead of individual DB_* vars
+
+### "Bookerville API errors"
+
+1. Check `BOOKERVILLE_API_KEY` is correct
+2. Verify `BOOKERVILLE_API_URL` is `https://app.bookerville.com/api/v2`
+3. Check Railway logs for specific error messages
+
+### "Contact form not sending"
+
+1. Verify all `MAIL_*` variables are set
+2. For Gmail: ensure you're using an **App Password** (not your regular password)
+   - Go to Google Account → Security → 2-Step Verification → App Passwords
+3. Check Railway logs for mail errors
 
 ### Images not loading
 
-1. Check image paths are relative, not absolute
-2. Verify images were uploaded to `public/images/`
-3. Check file permissions
-
-### API returning errors
-
-1. Check Bookerville API credentials
-2. Verify API key hasn't expired
-3. Check Laravel logs for specific error messages
+1. Verify images are in `public/images/` directory
+2. Check that image paths in React use relative paths
+3. Rebuild React if image paths changed: `npm run build` → re-upload
 
 ---
 
 ## Security Reminders
 
-1. **Never commit `.env` to git** - Contains passwords and API keys
-2. **Keep APP_DEBUG=false** in production - Prevents exposing sensitive info
-3. **Enable SSL** - Always use HTTPS
-4. **Regular backups** - Cloudways does automatic backups, but verify they're enabled
-5. **Update regularly** - Keep Laravel and packages updated for security patches
-6. **Strong passwords** - Use unique, strong passwords for all accounts
+1. **APP_DEBUG=false** — Never set to `true` in production (exposes sensitive info)
+2. **Environment variables in Railway** — Never hardcode secrets in code
+3. **SSL enabled** — Railway provides this free, always use HTTPS
+4. **Strong passwords** — Use unique, strong passwords for all accounts
+5. **Bookerville keys** — Keep API credentials only in Railway variables
+6. **Regular updates** — Keep Laravel and npm packages updated
 
 ---
 
@@ -364,50 +372,86 @@ https://your-domain.com/api/properties   # API endpoint (should return JSON)
 
 ### How to Update the React Frontend
 
-1. Make changes locally
+1. Make your changes locally in the `toplist-main` folder
 2. Run `npm run build`
-3. Upload new `dist/` contents to `public_html/public/`
-4. Clear browser cache
+3. Copy `dist/` contents to `control_toplist-homolog/public/`
+4. Commit and push — Railway auto-deploys
+
+```bash
+npm run build
+cp -r dist/* ../control_toplist-homolog/public/
+cd ../control_toplist-homolog
+git add public/
+git commit -m "Update frontend build"
+git push
+```
 
 ### How to Update the Laravel Backend
 
-1. Upload changed files via SFTP
-2. Run via SSH:
-   ```bash
-   php artisan migrate        # If database changes
-   php artisan config:cache   # Refresh config
-   php artisan route:cache    # Refresh routes
-   ```
+1. Make changes to Laravel files
+2. Commit and push — Railway auto-deploys
+
+```bash
+git add .
+git commit -m "Description of changes"
+git push
+```
 
 ### How to Check Logs
 
-```bash
-# Laravel logs
-tail -f ~/applications/your-app/public_html/storage/logs/laravel.log
+1. Railway dashboard → your service → **"Deployments"**
+2. Click on the latest deployment
+3. View real-time logs
 
-# Nginx logs
-tail -f ~/applications/your-app/nginx_logs/error.log
+Or use Railway CLI:
+
+```bash
+railway logs
 ```
 
-### Backup Before Major Changes
+### How to Rollback
 
-1. In Cloudways, go to Backup
-2. Click "Take Backup Now"
-3. Wait for backup to complete
-4. Then make your changes
+1. Railway dashboard → **"Deployments"**
+2. Find the previous working deployment
+3. Click **"Rollback"** — instant rollback to any previous deploy
+
+### Database Backups
+
+Railway Pro plan includes automatic database backups. For manual backup:
+
+```bash
+railway connect mysql
+mysqldump your_database > backup.sql
+```
+
+---
+
+## Cost Summary
+
+| Plan | Monthly Cost | Includes |
+|------|-------------|----------|
+| **Free (Trial)** | $0 | 500 hours, 512 MB RAM, 1 GB disk |
+| **Hobby** | $5 | 8 GB RAM, 100 GB disk, unlimited hours |
+| **Pro** | $20 | Priority support, team features |
+
+**Recommendation:** Start with Hobby ($5/month) for a production site. Includes enough resources for a small vacation rental site.
+
+MySQL database is included in the plan — no extra cost.
 
 ---
 
 ## Quick Reference
 
-| Task | Command/Location |
-|------|-----------------|
-| Clear all cache | `php artisan optimize:clear` |
-| View Laravel logs | `storage/logs/laravel.log` |
-| Application path | `/home/master/applications/your-app/public_html/` |
-| Public files | `/home/master/applications/your-app/public_html/public/` |
-| React build | Local: `npm run build` |
-| Upload files | Use FileZilla with SFTP |
+| Task | How |
+|------|-----|
+| Deploy code | `git push` (auto-deploys) |
+| View logs | Railway dashboard → Deployments → Logs |
+| Add env variable | Railway dashboard → Variables → New Variable |
+| Rollback | Railway dashboard → Deployments → Rollback |
+| Run Laravel commands | Railway dashboard → service terminal |
+| Check database | Railway dashboard → MySQL service |
+| Update React | `npm run build` → copy to public/ → push |
+| Custom domain | Railway → Settings → Networking → Custom Domain |
 
 ---
 
@@ -415,10 +459,12 @@ tail -f ~/applications/your-app/nginx_logs/error.log
 
 If you encounter issues not covered here:
 
-1. Check Laravel documentation: [laravel.com/docs](https://laravel.com/docs)
-2. Cloudways support: Use the chat in your dashboard
-3. Check browser console for JavaScript errors (F12 > Console)
+1. **Railway docs:** [docs.railway.app](https://docs.railway.app)
+2. **Railway Discord:** [discord.gg/railway](https://discord.gg/railway) — active community
+3. **Laravel docs:** [laravel.com/docs](https://laravel.com/docs)
+4. Check browser console for JavaScript errors (F12 → Console tab)
 
 ---
 
 *Last updated: February 2026*
+*Platform: Railway (railway.app)*
