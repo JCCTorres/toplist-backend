@@ -52,7 +52,7 @@ Plans:
 **Depends on**: Phase 2
 **Requirements**: UI-01, UI-02, UI-05, DEPLOY-01, DEPLOY-02
 **Success Criteria** (what must be TRUE):
-  1. All pages (Home, Properties, Property Detail, Resorts, Services, Contact, Management) have consistent, professional design
+  1. All pages (Home, Properties, Property Detail, Services, Contact, Management) have consistent, professional design
   2. Design matches mastervacationhomes.com quality level (clean, modern, vacation-appropriate)
   3. Site is fully responsive and polished on mobile devices
   4. Production build is deployed and accessible
@@ -60,8 +60,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Design polish across all pages with mobile verification
-- [ ] 03-02: Production build configuration and deployment
+- [ ] 03-01: Configure design system foundation, remove Resorts, implement dual footer, polish all pages with dark theme and mobile-first responsiveness
+- [ ] 03-02: Configure production build and create comprehensive deployment guide for Cloudways
 
 ## Progress
 
