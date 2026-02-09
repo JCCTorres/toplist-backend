@@ -14,9 +14,9 @@
 **Plans:** 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Backend PriceCalculatorService and API endpoint
-- [ ] 04-02-PLAN.md — Frontend PriceBreakdown component and PropertyDetails integration
-- [ ] 04-03-PLAN.md — PropertyCard pricing display
+- [x] 04-01-PLAN.md — Backend PriceCalculatorService and API endpoint
+- [x] 04-02-PLAN.md — Frontend PriceBreakdown component and PropertyDetails integration
+- [x] 04-03-PLAN.md — PropertyCard pricing display
 
 **Details:**
 Currently the site shows only base nightly rates. Actual vacation rental costs are typically 20-60% above base rate when cleaning fees, taxes, and Airbnb service fees are included. This phase adds a backend price calculation service that computes estimated totals, and frontend components to display the breakdown.
@@ -39,9 +39,10 @@ Currently the site shows only base nightly rates. Actual vacation rental costs a
 | 1. API Connection & Data Wiring | v1.0 | 2/2 | Complete | 2026-02-07 |
 | 2. Search, Availability & Booking Flow | v1.0 | 2/2 | Complete | 2026-02-07 |
 | 3. Design Polish & Deployment | v1.0 | 2/2 | Complete | 2026-02-08 |
-| 4. Improve Price Displayed Accuracy | v1.1 | 0/3 | Planned | — |
+| 4. Improve Price Displayed Accuracy | v1.1 | 3/3 | Complete | 2026-02-09 |
 
 ---
 *Roadmap created: 2026-02-07*
 *v1.0 completed: 2026-02-08 (3 phases, 6 plans, 18 requirements shipped)*
 *Phase 4 planned: 2026-02-09*
+*Phase 4 completed: 2026-02-09 (3 plans executed)*

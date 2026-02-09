@@ -386,6 +386,34 @@ class BookervilleController extends Controller
                     ?: $property->title
                     ?: "{$details['bedrooms']} Bedrooms / {$details['bathrooms']} Baths / {$details['city']}";
 
+                // Fetch nightly rate from Bookerville API
+                $nightlyRate = null;
+                try {
+                    $detailsResponse = $this->bookervilleService->getPropertyDetails([
+                        'propertyId' => $property->property_id
+                    ]);
+                    if ($detailsResponse['success'] && isset($detailsResponse['data']['rates'])) {
+                        $rates = $detailsResponse['data']['rates'];
+                        foreach ($rates as $rate) {
+                            if (($rate['nightly_rate'] ?? 0) > 0) {
+                                $nightlyRate = (float) $rate['nightly_rate'];
+                                break;
+                            }
+                        }
+                        // Fallback to weekend rate
+                        if ($nightlyRate === null) {
+                            foreach ($rates as $rate) {
+                                if (($rate['weekend_rate'] ?? 0) > 0) {
+                                    $nightlyRate = (float) $rate['weekend_rate'];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Silently fail — card will show without price
+                }
+
                 return [
                     'id' => $property->property_id,
                     'title' => $title,
@@ -396,6 +424,7 @@ class BookervilleController extends Controller
                     'city' => $details['city'] ?? '',
                     'state' => $details['state'] ?? '',
                     'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : (self::AIRBNB_ID_MAPPING[$property->property_id] ?? null),
+                    'nightly_rate' => $nightlyRate,
                 ];
             };
 
