@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ClientProperty;
 use App\Models\Property;
 use App\Services\BookervilleService;
+use App\Services\PriceCalculatorService;
 use App\Services\SyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -692,6 +693,82 @@ class BookervilleController extends Controller
         $query = http_build_query($params);
 
         return 'https://www.airbnb.com.br/book/stays/' . rawurlencode($airbnbId) . '?' . $query;
+    }
+
+    /**
+     * Get price estimate for a property stay
+     */
+    public function getPriceEstimate(Request $request, string $propertyId): JsonResponse
+    {
+        $validator = Validator::make(array_merge($request->all(), ['propertyId' => $propertyId]), [
+            'propertyId' => 'required|string',
+            'checkIn' => 'required|date_format:Y-m-d',
+            'checkOut' => 'required|date_format:Y-m-d|after:checkIn',
+            'guests' => 'sometimes|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $params = $validator->validated();
+            $checkIn = $params['checkIn'];
+            $checkOut = $params['checkOut'];
+            $guests = $params['guests'] ?? 2;
+
+            // Get property details from Bookerville
+            $detailsResponse = $this->bookervilleService->getPropertyDetails(['propertyId' => $propertyId]);
+
+            if (!$detailsResponse['success']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to fetch property details',
+                    'error' => $detailsResponse['error'] ?? 'Unknown error'
+                ], 400);
+            }
+
+            $propertyData = $detailsResponse['data'] ?? [];
+            $rates = $propertyData['rates'] ?? [];
+            $fees = $propertyData['fees'] ?? [];
+
+            // Calculate price estimate
+            $priceCalculator = new PriceCalculatorService();
+            $estimate = $priceCalculator->calculateStayPrice(
+                $rates,
+                $fees,
+                $checkIn,
+                $checkOut,
+                $guests,
+                2 // freeGuests default
+            );
+
+            // Check for calculation errors
+            if (isset($estimate['error'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $estimate['error'],
+                    'data' => $estimate
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $estimate,
+                'property_id' => $propertyId,
+                'property_name' => $propertyData['name'] ?? ''
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error calculating price estimate',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

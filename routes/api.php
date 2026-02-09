@@ -150,6 +150,7 @@ Route::prefix('/bookerville')->group(function () {
         Route::get('/cards', [PropertyController::class, 'getAllPropertiesCards']);
         Route::get('/category/{category}', [PropertyController::class, 'getPropertiesByCategory']);
         Route::get('/category/{category}/with-images', [PropertyController::class, 'getPropertiesByCategoryWithImages']);
+        Route::post('/{propertyId}/price-estimate', [BookervilleController::class, 'getPriceEstimate']);
         Route::get('/{propertyId}', [PropertyController::class, 'getProperty']);
     });
 
