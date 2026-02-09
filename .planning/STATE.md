@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 Phase: 4 of 4 (Improve Price Displayed Accuracy)
 Plan: 3 of 3
 Status: Phase complete
-Last activity: 2026-02-09 - Completed quick task 001: Replace hero video with optimized 1080p version
+Last activity: 2026-02-09 - Completed quick task 002: Improve Site Performance - Progressive Loading
 
 Progress: [##########] 100% (3/3 plans in Phase 4)
 
@@ -51,6 +51,7 @@ Archived decisions in PROJECT.md Key Decisions table. All outcomes marked Good.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 001 | Replace hero video with optimized 1080p version | 2026-02-09 | f964d27 | [001-replace-hero-video-with-optimized-1080p-](./quick/001-replace-hero-video-with-optimized-1080p-/) |
+| 002 | Improve Site Performance - Progressive Loading | 2026-02-09 | caede9f | [002-improve-site-performance-progressive-l](./quick/002-improve-site-performance-progressive-l/) |
 
 ### Roadmap Evolution
 
