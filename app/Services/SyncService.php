@@ -180,7 +180,9 @@ class SyncService
                     'description' => $detailsData['description'] ?? '',
                     'main_image' => $detailsData['photos'][0] ?? '',
                     'amenities' => $detailsData['amenities'] ?? [],
-                    'photos' => $detailsData['photos'] ?? []
+                    'photos' => $detailsData['photos'] ?? [],
+                    'rates' => $detailsData['rates'] ?? [],
+                    'fees' => $detailsData['fees'] ?? [],
                 ],
                 'category' => $category,
                 'last_sync' => Carbon::now(),

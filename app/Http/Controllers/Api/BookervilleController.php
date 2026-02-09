@@ -404,32 +404,22 @@ class BookervilleController extends Controller
                         ?: $property->title
                         ?: "{$details['bedrooms']} Bedrooms / {$details['bathrooms']} Baths / {$details['city']}";
 
-                    // Fetch nightly rate from Bookerville API
+                    // Read nightly rate from DB (persisted during sync)
                     $nightlyRate = null;
-                    try {
-                        $detailsResponse = $this->bookervilleService->getPropertyDetails([
-                            'propertyId' => $property->property_id
-                        ]);
-                        if ($detailsResponse['success'] && isset($detailsResponse['data']['rates'])) {
-                            $rates = $detailsResponse['data']['rates'];
-                            foreach ($rates as $rate) {
-                                if (($rate['nightly_rate'] ?? 0) > 0) {
-                                    $nightlyRate = (float) $rate['nightly_rate'];
-                                    break;
-                                }
-                            }
-                            // Fallback to weekend rate
-                            if ($nightlyRate === null) {
-                                foreach ($rates as $rate) {
-                                    if (($rate['weekend_rate'] ?? 0) > 0) {
-                                        $nightlyRate = (float) $rate['weekend_rate'];
-                                        break;
-                                    }
-                                }
+                    $rates = $details['rates'] ?? [];
+                    foreach ($rates as $rate) {
+                        if (($rate['nightly_rate'] ?? 0) > 0) {
+                            $nightlyRate = (float) $rate['nightly_rate'];
+                            break;
+                        }
+                    }
+                    if ($nightlyRate === null) {
+                        foreach ($rates as $rate) {
+                            if (($rate['weekend_rate'] ?? 0) > 0) {
+                                $nightlyRate = (float) $rate['weekend_rate'];
+                                break;
                             }
                         }
-                    } catch (\Exception $e) {
-                        // Silently fail — card will show without price
                     }
 
                     return [
