@@ -11,6 +11,7 @@ use App\Services\PriceMarkupService;
 use App\Services\SyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class BookervilleController extends Controller
@@ -378,76 +379,79 @@ class BookervilleController extends Controller
             $limit = (int) ($request->query('limit', 6));
             $perCategory = max(3, (int) ceil($limit / 2));
 
-            // Buscar propriedades e resorts com imagens válidas
-            $properties = $this->syncService->getPropertiesByCategoryWithImages('property', $perCategory);
-            $resorts = $this->syncService->getPropertiesByCategoryWithImages('resort', $perCategory);
+            $cacheKey = "home_cards_response_{$limit}";
+            $homeCards = Cache::remember($cacheKey, 3600, function () use ($perCategory) {
+                // Buscar propriedades e resorts com imagens válidas
+                $properties = $this->syncService->getPropertiesByCategoryWithImages('property', $perCategory);
+                $resorts = $this->syncService->getPropertiesByCategoryWithImages('resort', $perCategory);
 
-            // Formatar dados para o frontend
-            $formatCard = function ($property) {
-                $details = $property->details ?? [];
+                // Formatar dados para o frontend
+                $formatCard = function ($property) {
+                    $details = $property->details ?? [];
 
-                // Buscar título do cliente pelo endereço se existir
-                $clientTitle = null;
-                $address = $details['address'] ?? '';
-                if (!empty($address)) {
-                    if (is_array($address)) {
-                        $address = implode(', ', array_filter($address));
-                    }
-                    $clientTitle = $this->syncService->getClientTitleByAddress((string) $address);
-                }
-
-                // Determinar título final
-                $title = $clientTitle
-                    ?: $property->title
-                    ?: "{$details['bedrooms']} Bedrooms / {$details['bathrooms']} Baths / {$details['city']}";
-
-                // Fetch nightly rate from Bookerville API
-                $nightlyRate = null;
-                try {
-                    $detailsResponse = $this->bookervilleService->getPropertyDetails([
-                        'propertyId' => $property->property_id
-                    ]);
-                    if ($detailsResponse['success'] && isset($detailsResponse['data']['rates'])) {
-                        $rates = $detailsResponse['data']['rates'];
-                        foreach ($rates as $rate) {
-                            if (($rate['nightly_rate'] ?? 0) > 0) {
-                                $nightlyRate = (float) $rate['nightly_rate'];
-                                break;
-                            }
+                    // Buscar título do cliente pelo endereço se existir
+                    $clientTitle = null;
+                    $address = $details['address'] ?? '';
+                    if (!empty($address)) {
+                        if (is_array($address)) {
+                            $address = implode(', ', array_filter($address));
                         }
-                        // Fallback to weekend rate
-                        if ($nightlyRate === null) {
+                        $clientTitle = $this->syncService->getClientTitleByAddress((string) $address);
+                    }
+
+                    // Determinar título final
+                    $title = $clientTitle
+                        ?: $property->title
+                        ?: "{$details['bedrooms']} Bedrooms / {$details['bathrooms']} Baths / {$details['city']}";
+
+                    // Fetch nightly rate from Bookerville API
+                    $nightlyRate = null;
+                    try {
+                        $detailsResponse = $this->bookervilleService->getPropertyDetails([
+                            'propertyId' => $property->property_id
+                        ]);
+                        if ($detailsResponse['success'] && isset($detailsResponse['data']['rates'])) {
+                            $rates = $detailsResponse['data']['rates'];
                             foreach ($rates as $rate) {
-                                if (($rate['weekend_rate'] ?? 0) > 0) {
-                                    $nightlyRate = (float) $rate['weekend_rate'];
+                                if (($rate['nightly_rate'] ?? 0) > 0) {
+                                    $nightlyRate = (float) $rate['nightly_rate'];
                                     break;
                                 }
                             }
+                            // Fallback to weekend rate
+                            if ($nightlyRate === null) {
+                                foreach ($rates as $rate) {
+                                    if (($rate['weekend_rate'] ?? 0) > 0) {
+                                        $nightlyRate = (float) $rate['weekend_rate'];
+                                        break;
+                                    }
+                                }
+                            }
                         }
+                    } catch (\Exception $e) {
+                        // Silently fail — card will show without price
                     }
-                } catch (\Exception $e) {
-                    // Silently fail — card will show without price
-                }
+
+                    return [
+                        'id' => $property->property_id,
+                        'title' => $title,
+                        'subtitle' => ($details['name'] ?? '') . (($details['propertyType'] ?? $details['property_type'] ?? '') ? ' • ' . ($details['propertyType'] ?? $details['property_type'] ?? '') : ''),
+                        'guests' => ($details['maxGuests'] ?? $details['max_guests'] ?? 0) . " guests • {$details['bedrooms']} beds • {$details['bathrooms']} baths",
+                        'image' => $details['mainImage'] ?? $details['main_image'] ?? $property->main_image,
+                        'category' => $property->category,
+                        'city' => $details['city'] ?? '',
+                        'state' => $details['state'] ?? '',
+                        'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : (self::AIRBNB_ID_MAPPING[$property->property_id] ?? null),
+                        'nightly_rate' => $nightlyRate !== null ? PriceMarkupService::apply($nightlyRate) : null,
+                    ];
+                };
 
                 return [
-                    'id' => $property->property_id,
-                    'title' => $title,
-                    'subtitle' => ($details['name'] ?? '') . (($details['propertyType'] ?? $details['property_type'] ?? '') ? ' • ' . ($details['propertyType'] ?? $details['property_type'] ?? '') : ''),
-                    'guests' => ($details['maxGuests'] ?? $details['max_guests'] ?? 0) . " guests • {$details['bedrooms']} beds • {$details['bathrooms']} baths",
-                    'image' => $details['mainImage'] ?? $details['main_image'] ?? $property->main_image,
-                    'category' => $property->category,
-                    'city' => $details['city'] ?? '',
-                    'state' => $details['state'] ?? '',
-                    'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : (self::AIRBNB_ID_MAPPING[$property->property_id] ?? null),
-                    'nightly_rate' => $nightlyRate !== null ? PriceMarkupService::apply($nightlyRate) : null,
+                    'properties' => $properties->map($formatCard)->values(),
+                    'resorts' => $resorts->map($formatCard)->values(),
+                    'timestamp' => now()->toISOString()
                 ];
-            };
-
-            $homeCards = [
-                'properties' => $properties->map($formatCard)->values(),
-                'resorts' => $resorts->map($formatCard)->values(),
-                'timestamp' => now()->toISOString()
-            ];
+            });
 
             return response()->json([
                 'success' => true,

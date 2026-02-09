@@ -1,0 +1,38 @@
+# Version control
+.git
+.gitignore
+
+# Planning and docs
+.planning
+*.md
+!README.md
+
+# Screenshots and design files
+*.png
+*.jpg
+!public/**
+
+# IDE and OS files
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Stale folder (not used in production)
+Toplist Final/
+
+# Test and development files
+tests/
+phpunit.xml
+.env
+.env.local
+
+# Node modules (not needed for PHP app)
+node_modules/
+
+# Temporary files
+*.log
+*.stackdump
+nul
