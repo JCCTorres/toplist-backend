@@ -1076,7 +1076,10 @@ class BookervilleService
 
     /**
      * Check if a date range is truly available for a property by fetching BookedStays
-     * from the per-property API and checking for overlaps.
+     * from the per-property API and checking for overlaps, plus minimum nights validation.
+     *
+     * Uses the same logic as AvailabilityService::calculateAvailableDates() to ensure
+     * consistency between search results and property detail calendar.
      *
      * @param string $propertyId Bookerville property ID
      * @param string $startDate Search start date (Y-m-d)
@@ -1086,6 +1089,18 @@ class BookervilleService
     private function isDateRangeAvailable(string $propertyId, string $startDate, string $endDate): bool
     {
         try {
+            // Calculate requested nights
+            $requestedNights = (int) ((strtotime($endDate) - strtotime($startDate)) / 86400);
+
+            if ($requestedNights < 1) {
+                Log::info('Invalid date range - less than 1 night', [
+                    'propertyId' => $propertyId,
+                    'startDate' => $startDate,
+                    'endDate' => $endDate
+                ]);
+                return false;
+            }
+
             // Fetch BookedStays from per-property API
             $url = "{$this->baseUrl}/API-PropertyAvailability?s3cr3tK3y={$this->apiKey}&bkvPropertyId={$propertyId}";
 
@@ -1102,49 +1117,156 @@ class BookervilleService
                     'propertyId' => $propertyId,
                     'status' => $response->status()
                 ]);
-                // If we can't verify, assume available (fail open to avoid blocking all results)
-                return true;
+                // If we can't verify, assume NOT available (fail closed for accuracy)
+                return false;
             }
 
             $xmlData = $response->body();
             $xml = simplexml_load_string($xmlData);
 
-            if ($xml === false || !isset($xml->BookedStays)) {
-                // No BookedStays means property is available
-                return true;
+            if ($xml === false) {
+                Log::warning('Failed to parse property availability XML', [
+                    'propertyId' => $propertyId
+                ]);
+                return false;
             }
 
-            $bookedStays = $xml->BookedStays->BookedStay ?? [];
+            // Check for booked stays overlap
+            if (isset($xml->BookedStays)) {
+                $bookedStays = $xml->BookedStays->BookedStay ?? [];
 
-            // Normalize to array
-            if (!is_array($bookedStays) && !($bookedStays instanceof \Traversable)) {
-                $bookedStays = [$bookedStays];
-            }
-
-            $searchStart = strtotime($startDate);
-            $searchEnd = strtotime($endDate);
-
-            foreach ($bookedStays as $stay) {
-                $status = strtolower((string) $stay->BookingStatus);
-
-                // Skip cancelled bookings
-                if ($status === 'cancelled') {
-                    continue;
+                // Normalize to array
+                if (!is_array($bookedStays) && !($bookedStays instanceof \Traversable)) {
+                    $bookedStays = [$bookedStays];
                 }
 
-                $arrivalDate = strtotime((string) $stay->ArrivalDate);
-                $departureDate = strtotime((string) $stay->DepartureDate);
+                // Convert booked stays to array for cross-reference
+                $staysArray = [];
+                foreach ($bookedStays as $stay) {
+                    $status = strtolower((string) $stay->BookingStatus);
+                    if ($status !== 'cancelled') {
+                        $staysArray[] = [
+                            'arrivalDate' => (string) $stay->ArrivalDate,
+                            'departureDate' => (string) $stay->DepartureDate,
+                            'confirmCode' => (string) $stay->ConfirmCode
+                        ];
+                    }
+                }
 
-                // Check for date range overlap
-                // Overlap exists if: searchStart < departureDate AND searchEnd > arrivalDate
-                if ($searchStart < $departureDate && $searchEnd > $arrivalDate) {
-                    Log::info('Property unavailable for date range', [
+                // Check each day in the requested range using same logic as AvailabilityService
+                $currentDate = new \DateTime($startDate);
+                $endDateObj = new \DateTime($endDate);
+
+                while ($currentDate < $endDateObj) {
+                    $dateStr = $currentDate->format('Y-m-d');
+                    $checkDate = new \DateTime($dateStr);
+                    $isBooked = false;
+
+                    foreach ($staysArray as $stay) {
+                        $arrival = new \DateTime($stay['arrivalDate']);
+                        $departure = new \DateTime($stay['departureDate']);
+
+                        // Check if this is arrival or departure day
+                        $isArrivalDay = $checkDate == $arrival;
+                        $isDepartureDay = $checkDate == $departure;
+
+                        // Check for overlapping arrivals on departure day
+                        if ($isDepartureDay) {
+                            foreach ($staysArray as $otherStay) {
+                                if ($otherStay['confirmCode'] === $stay['confirmCode']) continue;
+                                $otherArrival = new \DateTime($otherStay['arrivalDate']);
+                                if ($otherArrival == $departure) {
+                                    $isBooked = true;
+                                    break 2;
+                                }
+                            }
+                        }
+
+                        // Check for departure on arrival day
+                        if ($isArrivalDay) {
+                            foreach ($staysArray as $otherStay) {
+                                if ($otherStay['confirmCode'] === $stay['confirmCode']) continue;
+                                $otherDeparture = new \DateTime($otherStay['departureDate']);
+                                if ($otherDeparture == $arrival) {
+                                    $isBooked = true;
+                                    break 2;
+                                }
+                            }
+                        }
+
+                        // Skip if only arrival day (without overlapping departure)
+                        if ($isArrivalDay && !$isDepartureDay && !$isBooked) {
+                            continue;
+                        }
+
+                        // Standard overlap check: arrival <= checkDate < departure
+                        if ($checkDate >= $arrival && $checkDate < $departure) {
+                            $isBooked = true;
+                            break;
+                        }
+                    }
+
+                    if ($isBooked) {
+                        Log::info('Property unavailable - date is booked', [
+                            'propertyId' => $propertyId,
+                            'blockedDate' => $dateStr,
+                            'searchStart' => $startDate,
+                            'searchEnd' => $endDate
+                        ]);
+                        return false;
+                    }
+
+                    $currentDate->modify('+1 day');
+                }
+            }
+
+            // Check minimum nights requirement from property details
+            $detailsResponse = $this->getPropertyDetails(['propertyId' => $propertyId]);
+
+            if ($detailsResponse['success'] && isset($detailsResponse['data'])) {
+                $propertyData = $detailsResponse['data'];
+
+                // Check rates for minimum stay during the requested period
+                $rates = $propertyData['rates'] ?? [];
+                $minStays = $propertyData['min_stays'] ?? [];
+
+                $applicableMinNights = 1; // Default minimum
+
+                // Check rate-based minimum stays first
+                foreach ($rates as $rate) {
+                    $rateStart = $rate['start_date'] ?? null;
+                    $rateEnd = $rate['end_date'] ?? null;
+                    $rateMinStay = (int) ($rate['minimum_stay'] ?? 1);
+
+                    if ($rateStart && $rateEnd) {
+                        // Check if the search dates fall within this rate period
+                        if ($startDate >= $rateStart && $startDate <= $rateEnd) {
+                            $applicableMinNights = max($applicableMinNights, $rateMinStay);
+                        }
+                    }
+                }
+
+                // Also check explicit min_stays periods
+                foreach ($minStays as $minStay) {
+                    $msStart = $minStay['start_date'] ?? null;
+                    $msEnd = $minStay['end_date'] ?? null;
+                    $msNights = (int) ($minStay['minimum_nights'] ?? 1);
+
+                    if ($msStart && $msEnd) {
+                        if ($startDate >= $msStart && $startDate <= $msEnd) {
+                            $applicableMinNights = max($applicableMinNights, $msNights);
+                        }
+                    }
+                }
+
+                // Enforce minimum nights
+                if ($requestedNights < $applicableMinNights) {
+                    Log::info('Property unavailable - minimum nights not met', [
                         'propertyId' => $propertyId,
-                        'searchStart' => $startDate,
-                        'searchEnd' => $endDate,
-                        'bookedArrival' => (string) $stay->ArrivalDate,
-                        'bookedDeparture' => (string) $stay->DepartureDate,
-                        'bookingStatus' => $status
+                        'requestedNights' => $requestedNights,
+                        'minimumNights' => $applicableMinNights,
+                        'startDate' => $startDate,
+                        'endDate' => $endDate
                     ]);
                     return false;
                 }
@@ -1159,8 +1281,8 @@ class BookervilleService
                 'endDate' => $endDate,
                 'error' => $e->getMessage()
             ]);
-            // Fail open - if we can't verify, assume available
-            return true;
+            // Fail closed for accuracy - if we can't verify, assume NOT available
+            return false;
         }
     }
 
