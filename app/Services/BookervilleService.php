@@ -762,6 +762,11 @@ class BookervilleService
             }
         }
 
+        // Sort reviews newest first by review_date
+        usort($reviews, function ($a, $b) {
+            return strcmp($b['review_date'], $a['review_date']);
+        });
+
         $totalRating = array_sum(array_column($reviews, 'rating'));
         $averageRating = count($reviews) > 0 ? round($totalRating / count($reviews), 1) : 0;
 
