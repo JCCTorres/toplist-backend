@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-08)
 Phase: 4 of 4 (Improve Price Displayed Accuracy)
 Plan: 3 of 3
 Status: Phase complete
-Last activity: 2026-02-09 - Completed 04-03-PLAN.md (PropertyCard Price Display)
+Last activity: 2026-02-09 - Completed quick task 001: Replace hero video with optimized 1080p version
 
 Progress: [##########] 100% (3/3 plans in Phase 4)
 
@@ -45,6 +45,12 @@ Archived decisions in PROJECT.md Key Decisions table. All outcomes marked Good.
 
 - CORS wildcard in config/cors.php (tighten for production domain)
 - API credentials in .env.example (clean up before public repo)
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 001 | Replace hero video with optimized 1080p version | 2026-02-09 | f964d27 | [001-replace-hero-video-with-optimized-1080p-](./quick/001-replace-hero-video-with-optimized-1080p-/) |
 
 ### Roadmap Evolution
 
