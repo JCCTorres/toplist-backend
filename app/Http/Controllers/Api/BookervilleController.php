@@ -7,6 +7,7 @@ use App\Models\ClientProperty;
 use App\Models\Property;
 use App\Services\BookervilleService;
 use App\Services\PriceCalculatorService;
+use App\Services\PriceMarkupService;
 use App\Services\SyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -152,6 +153,20 @@ class BookervilleController extends Controller
                     $result['data']['airbnb_id'] = $airbnbId;
                 } elseif (is_array($result)) {
                     $result['airbnb_id'] = $airbnbId;
+                }
+            }
+
+            // Apply price markup to rates and fees
+            if (is_array($result) && isset($result['data'])) {
+                if (isset($result['data']['rates']) && is_array($result['data']['rates'])) {
+                    $result['data']['rates'] = PriceMarkupService::applyToRates($result['data']['rates']);
+                }
+                if (isset($result['data']['fees']) && is_array($result['data']['fees'])) {
+                    foreach (['cleaning_fee', 'additional_guest_fee'] as $feeKey) {
+                        if (isset($result['data']['fees'][$feeKey]) && is_numeric($result['data']['fees'][$feeKey])) {
+                            $result['data']['fees'][$feeKey] = PriceMarkupService::apply($result['data']['fees'][$feeKey]);
+                        }
+                    }
                 }
             }
 
@@ -424,7 +439,7 @@ class BookervilleController extends Controller
                     'city' => $details['city'] ?? '',
                     'state' => $details['state'] ?? '',
                     'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : (self::AIRBNB_ID_MAPPING[$property->property_id] ?? null),
-                    'nightly_rate' => $nightlyRate,
+                    'nightly_rate' => $nightlyRate !== null ? PriceMarkupService::apply($nightlyRate) : null,
                 ];
             };
 
@@ -775,6 +790,11 @@ class BookervilleController extends Controller
                 $guests,
                 2 // freeGuests default
             );
+
+            // Apply price markup to estimate
+            if (!isset($estimate['error'])) {
+                $estimate = PriceMarkupService::applyToBreakdown($estimate);
+            }
 
             // Check for calculation errors
             if (isset($estimate['error'])) {

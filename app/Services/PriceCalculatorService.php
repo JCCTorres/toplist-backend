@@ -80,8 +80,8 @@ class PriceCalculatorService
         // Calculate tax
         $taxAmount = round($subtotal * ($taxRate / 100), 2);
 
-        // Calculate estimated Airbnb service fee (14.2% average guest fee)
-        $estimatedAirbnbFee = round($subtotal * 0.142, 2);
+        // Calculate taxes (13.5%)
+        $estimatedAirbnbFee = round($subtotal * 0.135, 2);
 
         // Calculate estimated total
         $estimatedTotal = round($subtotal + $taxAmount + $estimatedAirbnbFee, 2);

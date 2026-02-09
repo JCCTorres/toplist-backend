@@ -6,6 +6,7 @@ use App\Config\BookervilleConfig;
 use App\Models\BookervilleProperty;
 use App\Models\ClientProperty;
 use App\Models\Property;
+use App\Services\PriceMarkupService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -924,7 +925,7 @@ class BookervilleService
                 $priceString = (string) $result->bookingPriceFrom;
                 $cleanPrice = preg_replace('/[^\d.]/', '', $priceString);
                 if (!empty($cleanPrice) && is_numeric($cleanPrice)) {
-                    $price = (float) $cleanPrice;
+                    $price = PriceMarkupService::apply((float) $cleanPrice);
                 }
 
                 // Extrair endereço e cidade do propertyDisplayName

@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'price_markup_percent' => (float) env('PRICE_MARKUP_PERCENT', 25),
+
 ];
