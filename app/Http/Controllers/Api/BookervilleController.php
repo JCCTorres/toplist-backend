@@ -12,6 +12,7 @@ use App\Services\SyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class BookervilleController extends Controller
@@ -380,7 +381,9 @@ class BookervilleController extends Controller
             $perCategory = max(3, (int) ceil($limit / 2));
 
             $cacheKey = "home_cards_response_{$limit}";
-            $homeCards = Cache::remember($cacheKey, 3600, function () use ($perCategory) {
+            $homeCards = Cache::get($cacheKey);
+
+            if ($homeCards === null) {
                 // Buscar propriedades e resorts com imagens válidas
                 $properties = $this->syncService->getPropertiesByCategoryWithImages('property', $perCategory);
                 $resorts = $this->syncService->getPropertiesByCategoryWithImages('resort', $perCategory);
@@ -436,12 +439,23 @@ class BookervilleController extends Controller
                     ];
                 };
 
-                return [
+                $homeCards = [
                     'properties' => $properties->map($formatCard)->values(),
                     'resorts' => $resorts->map($formatCard)->values(),
                     'timestamp' => now()->toISOString()
                 ];
-            });
+
+                // Only cache if at least one card has a valid nightly_rate
+                // to avoid poisoning the cache with "Contact for Pricing" data
+                $allCards = collect($homeCards['properties'])->merge($homeCards['resorts']);
+                $hasAnyRate = $allCards->contains(fn ($card) => $card['nightly_rate'] !== null);
+
+                if ($hasAnyRate) {
+                    Cache::put($cacheKey, $homeCards, 3600);
+                } else {
+                    Log::warning("[getHomeCards] Skipping cache — all nightly_rate values are null for limit={$limit}");
+                }
+            }
 
             return response()->json([
                 'success' => true,

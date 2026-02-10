@@ -8,6 +8,7 @@ use App\Services\BookervilleService;
 use App\Services\ClientPropertyService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
+use App\Services\PriceMarkupService;
 use Carbon\Carbon;
 
 class SyncService
@@ -680,6 +681,7 @@ class SyncService
                     ]),
                     'subtitle' => ($details['name'] ?? '') . ($property->property_type ? ' • ' . $property->property_type : ''),
                     'image' => $property->main_image_url ?? $property->main_image,
+                    'nightly_rate' => $this->extractNightlyRate($details),
                     'source' => 'bookerville'
                 ];
                 
@@ -851,6 +853,29 @@ class SyncService
     /**
      * Formata as informações de hóspedes/quartos/banheiros
      */
+    private function extractNightlyRate(array $details): ?float
+    {
+        $rates = $details['rates'] ?? [];
+        $nightlyRate = null;
+
+        foreach ($rates as $rate) {
+            if (($rate['nightly_rate'] ?? 0) > 0) {
+                $nightlyRate = (float) $rate['nightly_rate'];
+                break;
+            }
+        }
+        if ($nightlyRate === null) {
+            foreach ($rates as $rate) {
+                if (($rate['weekend_rate'] ?? 0) > 0) {
+                    $nightlyRate = (float) $rate['weekend_rate'];
+                    break;
+                }
+            }
+        }
+
+        return $nightlyRate !== null ? PriceMarkupService::apply($nightlyRate) : null;
+    }
+
     private function formatGuestInfo(array $details): string
     {
         $maxGuests = $details['max_guests'] ?? 0;

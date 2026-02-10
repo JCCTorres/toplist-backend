@@ -675,15 +675,15 @@ class BookervilleService
         if ($ratesXml && isset($ratesXml->Rate)) {
             foreach ($ratesXml->Rate as $rate) {
                 $rates[] = [
-                    'season' => (string) $rate->Label ?? '',
-                    'start_date' => (string) $rate->StartDate ?? '',
-                    'end_date' => (string) $rate->EndDate ?? '',
-                    'nightly_rate' => (float) $rate->DailyWeeknightRate ?? 0,
-                    'weekend_rate' => (float) $rate->DailyWeekendRate ?? 0,
-                    'weekly_rate' => (float) $rate->WeeklyRate ?? 0,
-                    'monthly_rate' => (float) $rate->MonthlyRate ?? 0,
-                    'minimum_stay' => (int) $rate->MinimumStay ?? 1,
-                    'weekend_nights' => (string) $rate->WeekendNights ?? ''
+                    'season' => (string) ($rate->Label ?? ''),
+                    'start_date' => (string) ($rate->StartDate ?? ''),
+                    'end_date' => (string) ($rate->EndDate ?? ''),
+                    'nightly_rate' => (float) ($rate->DailyWeeknightRate ?? 0),
+                    'weekend_rate' => (float) ($rate->DailyWeekendRate ?? 0),
+                    'weekly_rate' => (float) ($rate->WeeklyRate ?? 0),
+                    'monthly_rate' => (float) ($rate->MonthlyRate ?? 0),
+                    'minimum_stay' => (int) ($rate->MinimumStay ?? 1),
+                    'weekend_nights' => (string) ($rate->WeekendNights ?? '')
                 ];
             }
         }
