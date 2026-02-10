@@ -388,8 +388,38 @@ class BookervilleController extends Controller
                 $properties = $this->syncService->getPropertiesByCategoryWithImages('property', $perCategory);
                 $resorts = $this->syncService->getPropertiesByCategoryWithImages('resort', $perCategory);
 
+                // Prefetch live rates for properties missing them in DB (avoids N+1 API calls in the loop)
+                $liveRatesMap = [];
+                $allProps = $properties->merge($resorts);
+                $missingRateIds = $allProps->filter(function ($p) {
+                    $details = $p->details ?? [];
+                    $rates = $details['rates'] ?? [];
+                    foreach ($rates as $rate) {
+                        if (($rate['nightly_rate'] ?? 0) > 0 || ($rate['weekend_rate'] ?? 0) > 0) {
+                            return false; // has rates in DB
+                        }
+                    }
+                    return true; // needs live fetch
+                })->pluck('property_id')->all();
+
+                if (!empty($missingRateIds)) {
+                    Log::info("[getHomeCards] Prefetching live rates for " . count($missingRateIds) . " properties");
+                    foreach ($missingRateIds as $pid) {
+                        try {
+                            $liveDetails = $this->bookervilleService->getPropertyDetails([
+                                'propertyId' => $pid
+                            ]);
+                            if ($liveDetails['success'] && !empty($liveDetails['data']['rates'])) {
+                                $liveRatesMap[$pid] = $liveDetails['data']['rates'];
+                            }
+                        } catch (\Exception $e) {
+                            Log::warning("Failed to prefetch live rates for {$pid}: " . $e->getMessage());
+                        }
+                    }
+                }
+
                 // Formatar dados para o frontend
-                $formatCard = function ($property) {
+                $formatCard = function ($property) use ($liveRatesMap) {
                     $details = $property->details ?? [];
 
                     // Buscar título do cliente pelo endereço se existir
@@ -425,31 +455,22 @@ class BookervilleController extends Controller
                         }
                     }
 
-                    // If DB has no rates, fetch live from Bookerville API
-                    if ($nightlyRate === null) {
-                        try {
-                            $liveDetails = $this->bookervilleService->getPropertyDetails([
-                                'propertyId' => $property->property_id
-                            ]);
-                            if ($liveDetails['success'] && !empty($liveDetails['data']['rates'])) {
-                                $liveRates = $liveDetails['data']['rates'];
-                                foreach ($liveRates as $rate) {
-                                    if (($rate['nightly_rate'] ?? 0) > 0) {
-                                        $nightlyRate = (float) $rate['nightly_rate'];
-                                        break;
-                                    }
-                                }
-                                if ($nightlyRate === null) {
-                                    foreach ($liveRates as $rate) {
-                                        if (($rate['weekend_rate'] ?? 0) > 0) {
-                                            $nightlyRate = (float) $rate['weekend_rate'];
-                                            break;
-                                        }
-                                    }
+                    // Fallback to prefetched live rates if DB had none
+                    if ($nightlyRate === null && isset($liveRatesMap[$property->property_id])) {
+                        $liveRates = $liveRatesMap[$property->property_id];
+                        foreach ($liveRates as $rate) {
+                            if (($rate['nightly_rate'] ?? 0) > 0) {
+                                $nightlyRate = (float) $rate['nightly_rate'];
+                                break;
+                            }
+                        }
+                        if ($nightlyRate === null) {
+                            foreach ($liveRates as $rate) {
+                                if (($rate['weekend_rate'] ?? 0) > 0) {
+                                    $nightlyRate = (float) $rate['weekend_rate'];
+                                    break;
                                 }
                             }
-                        } catch (\Exception $e) {
-                            Log::warning("Failed to fetch live rates for {$property->property_id}: " . $e->getMessage());
                         }
                     }
 

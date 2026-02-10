@@ -572,9 +572,12 @@ class SyncService
                 }
             }
 
+            // Prefetch live rates for properties missing them in DB (avoids N+1 API calls)
+            $liveRatesMap = $this->prefetchMissingRates($properties);
+
             // Formatar dados para o frontend (mesmo formato dos home cards)
-            $allCards = $properties->map(function ($property) {
-                return $this->formatPropertyCard($property);
+            $allCards = $properties->map(function ($property) use ($liveRatesMap) {
+                return $this->formatPropertyCard($property, $liveRatesMap);
             });
 
             Log::info("Cards formatados: " . $allCards->count() . " propriedades");
@@ -603,7 +606,7 @@ class SyncService
     /**
      * Formata uma propriedade como card para o frontend
      */
-    private function formatPropertyCard(Property $property): array
+    private function formatPropertyCard(Property $property, array $liveRatesMap = []): array
     {
         try {
             $details = $property->details ?? [];
@@ -682,7 +685,7 @@ class SyncService
                     ]),
                     'subtitle' => ($details['name'] ?? '') . ($property->property_type ? ' • ' . $property->property_type : ''),
                     'image' => $property->main_image_url ?? $property->main_image,
-                    'nightly_rate' => $this->extractNightlyRate($details, $property->property_id),
+                    'nightly_rate' => $this->extractNightlyRate($details, $property->property_id, $liveRatesMap),
                     'rates' => $details['rates'] ?? [],
                     'source' => 'bookerville'
                 ];
@@ -790,7 +793,7 @@ class SyncService
                     'max_guests' => $property->max_guests ?? $details['max_guests'] ?? 0,
                     'last_sync' => $property->last_sync?->toISOString(),
                     'is_active' => $property->is_active,
-                    'nightly_rate' => $this->extractNightlyRate($details, $property->property_id),
+                    'nightly_rate' => $this->extractNightlyRate($details, $property->property_id, $liveRatesMap),
                     'rates' => $details['rates'] ?? [],
                     'details' => $property->details,
                     'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : (self::AIRBNB_ID_MAPPING[$property->property_id] ?? null),
@@ -857,9 +860,55 @@ class SyncService
     }
 
     /**
+     * Prefetch live rates from Bookerville API for properties missing rates in DB.
+     * Returns a map of propertyId => rates array.
+     */
+    private function prefetchMissingRates($properties): array
+    {
+        $liveRatesMap = [];
+        $missingIds = [];
+
+        foreach ($properties as $property) {
+            if ($property->source !== 'bookerville') {
+                continue;
+            }
+            $details = $property->details ?? [];
+            $rates = $details['rates'] ?? [];
+            $hasRate = false;
+            foreach ($rates as $rate) {
+                if (($rate['nightly_rate'] ?? 0) > 0 || ($rate['weekend_rate'] ?? 0) > 0) {
+                    $hasRate = true;
+                    break;
+                }
+            }
+            if (!$hasRate) {
+                $missingIds[] = $property->property_id;
+            }
+        }
+
+        if (!empty($missingIds)) {
+            Log::info("[prefetchMissingRates] Fetching live rates for " . count($missingIds) . " properties");
+            foreach ($missingIds as $pid) {
+                try {
+                    $liveDetails = $this->bookervilleService->getPropertyDetails([
+                        'propertyId' => $pid
+                    ]);
+                    if ($liveDetails['success'] && !empty($liveDetails['data']['rates'])) {
+                        $liveRatesMap[$pid] = $liveDetails['data']['rates'];
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("Failed to prefetch live rates for {$pid}: " . $e->getMessage());
+                }
+            }
+        }
+
+        return $liveRatesMap;
+    }
+
+    /**
      * Formata as informações de hóspedes/quartos/banheiros
      */
-    private function extractNightlyRate(array $details, ?string $propertyId = null): ?float
+    private function extractNightlyRate(array $details, ?string $propertyId = null, array $liveRatesMap = []): ?float
     {
         $rates = $details['rates'] ?? [];
         $nightlyRate = null;
@@ -879,31 +928,22 @@ class SyncService
             }
         }
 
-        // Live fallback: fetch from Bookerville API if DB has no rates
-        if ($nightlyRate === null && $propertyId) {
-            try {
-                $liveDetails = $this->bookervilleService->getPropertyDetails([
-                    'propertyId' => $propertyId
-                ]);
-                if ($liveDetails['success'] && !empty($liveDetails['data']['rates'])) {
-                    $liveRates = $liveDetails['data']['rates'];
-                    foreach ($liveRates as $rate) {
-                        if (($rate['nightly_rate'] ?? 0) > 0) {
-                            $nightlyRate = (float) $rate['nightly_rate'];
-                            break;
-                        }
-                    }
-                    if ($nightlyRate === null) {
-                        foreach ($liveRates as $rate) {
-                            if (($rate['weekend_rate'] ?? 0) > 0) {
-                                $nightlyRate = (float) $rate['weekend_rate'];
-                                break;
-                            }
-                        }
+        // Fallback to prefetched live rates if DB had none
+        if ($nightlyRate === null && $propertyId && isset($liveRatesMap[$propertyId])) {
+            $liveRates = $liveRatesMap[$propertyId];
+            foreach ($liveRates as $rate) {
+                if (($rate['nightly_rate'] ?? 0) > 0) {
+                    $nightlyRate = (float) $rate['nightly_rate'];
+                    break;
+                }
+            }
+            if ($nightlyRate === null) {
+                foreach ($liveRates as $rate) {
+                    if (($rate['weekend_rate'] ?? 0) > 0) {
+                        $nightlyRate = (float) $rate['weekend_rate'];
+                        break;
                     }
                 }
-            } catch (\Exception $e) {
-                // Silently fail — "Contact for pricing" is acceptable fallback
             }
         }
 
