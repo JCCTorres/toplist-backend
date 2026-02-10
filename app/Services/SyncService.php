@@ -186,6 +186,7 @@ class SyncService
                     'fees' => $detailsData['fees'] ?? [],
                 ],
                 'category' => $category,
+                'source' => 'bookerville',
                 'last_sync' => Carbon::now(),
                 'is_active' => true
             ];
@@ -775,20 +776,24 @@ class SyncService
                     'title' => $property->title ?: 'Propriedade sem título',
                     'subtitle' => $property->category ?? '',
                     'guests' => $this->formatGuestInfo([
-                        'max_guests' => $property->max_guests ?? 0,
-                        'bedrooms' => $property->bedrooms ?? 0,
-                        'bathrooms' => $property->bathrooms ?? 0
+                        'max_guests' => $property->max_guests ?? $details['max_guests'] ?? 0,
+                        'bedrooms' => $property->bedrooms ?? $details['bedrooms'] ?? 0,
+                        'bathrooms' => $property->bathrooms ?? $details['bathrooms'] ?? 0
                     ]),
-                    'image' => $property->main_image ?? '',
+                    'image' => $property->main_image ?? $details['main_image'] ?? '',
                     'category' => $property->category,
-                    'city' => $city,
-                    'state' => $state,
+                    'city' => $city ?: ($details['city'] ?? ''),
+                    'state' => $state ?: ($details['state'] ?? ''),
                     'address' => $address,
-                    'bedrooms' => $property->bedrooms ?? 0,
-                    'bathrooms' => $property->bathrooms ?? 0,
-                    'max_guests' => $property->max_guests ?? 0,
+                    'bedrooms' => $property->bedrooms ?? $details['bedrooms'] ?? 0,
+                    'bathrooms' => $property->bathrooms ?? $details['bathrooms'] ?? 0,
+                    'max_guests' => $property->max_guests ?? $details['max_guests'] ?? 0,
                     'last_sync' => $property->last_sync?->toISOString(),
                     'is_active' => $property->is_active,
+                    'nightly_rate' => $this->extractNightlyRate($details),
+                    'rates' => $details['rates'] ?? [],
+                    'details' => $property->details,
+                    'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : (self::AIRBNB_ID_MAPPING[$property->property_id] ?? null),
                     'source' => $property->source ?? 'legacy'
                 ];
             }
