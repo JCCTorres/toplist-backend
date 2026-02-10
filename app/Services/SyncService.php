@@ -682,7 +682,7 @@ class SyncService
                     ]),
                     'subtitle' => ($details['name'] ?? '') . ($property->property_type ? ' • ' . $property->property_type : ''),
                     'image' => $property->main_image_url ?? $property->main_image,
-                    'nightly_rate' => $this->extractNightlyRate($details),
+                    'nightly_rate' => $this->extractNightlyRate($details, $property->property_id),
                     'rates' => $details['rates'] ?? [],
                     'source' => 'bookerville'
                 ];
@@ -790,7 +790,7 @@ class SyncService
                     'max_guests' => $property->max_guests ?? $details['max_guests'] ?? 0,
                     'last_sync' => $property->last_sync?->toISOString(),
                     'is_active' => $property->is_active,
-                    'nightly_rate' => $this->extractNightlyRate($details),
+                    'nightly_rate' => $this->extractNightlyRate($details, $property->property_id),
                     'rates' => $details['rates'] ?? [],
                     'details' => $property->details,
                     'airbnb_id' => $property->airbnb_id ? (string) $property->airbnb_id : (self::AIRBNB_ID_MAPPING[$property->property_id] ?? null),
@@ -859,7 +859,7 @@ class SyncService
     /**
      * Formata as informações de hóspedes/quartos/banheiros
      */
-    private function extractNightlyRate(array $details): ?float
+    private function extractNightlyRate(array $details, ?string $propertyId = null): ?float
     {
         $rates = $details['rates'] ?? [];
         $nightlyRate = null;
@@ -876,6 +876,34 @@ class SyncService
                     $nightlyRate = (float) $rate['weekend_rate'];
                     break;
                 }
+            }
+        }
+
+        // Live fallback: fetch from Bookerville API if DB has no rates
+        if ($nightlyRate === null && $propertyId) {
+            try {
+                $liveDetails = $this->bookervilleService->getPropertyDetails([
+                    'propertyId' => $propertyId
+                ]);
+                if ($liveDetails['success'] && !empty($liveDetails['data']['rates'])) {
+                    $liveRates = $liveDetails['data']['rates'];
+                    foreach ($liveRates as $rate) {
+                        if (($rate['nightly_rate'] ?? 0) > 0) {
+                            $nightlyRate = (float) $rate['nightly_rate'];
+                            break;
+                        }
+                    }
+                    if ($nightlyRate === null) {
+                        foreach ($liveRates as $rate) {
+                            if (($rate['weekend_rate'] ?? 0) > 0) {
+                                $nightlyRate = (float) $rate['weekend_rate'];
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Silently fail — "Contact for pricing" is acceptable fallback
             }
         }
 

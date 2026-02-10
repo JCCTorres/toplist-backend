@@ -425,6 +425,34 @@ class BookervilleController extends Controller
                         }
                     }
 
+                    // If DB has no rates, fetch live from Bookerville API
+                    if ($nightlyRate === null) {
+                        try {
+                            $liveDetails = $this->bookervilleService->getPropertyDetails([
+                                'propertyId' => $property->property_id
+                            ]);
+                            if ($liveDetails['success'] && !empty($liveDetails['data']['rates'])) {
+                                $liveRates = $liveDetails['data']['rates'];
+                                foreach ($liveRates as $rate) {
+                                    if (($rate['nightly_rate'] ?? 0) > 0) {
+                                        $nightlyRate = (float) $rate['nightly_rate'];
+                                        break;
+                                    }
+                                }
+                                if ($nightlyRate === null) {
+                                    foreach ($liveRates as $rate) {
+                                        if (($rate['weekend_rate'] ?? 0) > 0) {
+                                            $nightlyRate = (float) $rate['weekend_rate'];
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            Log::warning("Failed to fetch live rates for {$property->property_id}: " . $e->getMessage());
+                        }
+                    }
+
                     return [
                         'id' => $property->property_id,
                         'title' => $title,
