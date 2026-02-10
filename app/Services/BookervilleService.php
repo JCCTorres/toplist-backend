@@ -173,6 +173,7 @@ class BookervilleService
     public function getPropertyDetails(array $params): array
     {
         $propertyId = $params['propertyId'] ?? null;
+        $skipCache = $params['skipCache'] ?? false;
 
         if (!$propertyId) {
             return [
@@ -183,6 +184,10 @@ class BookervilleService
         }
 
         $cacheKey = "bookerville_details_{$propertyId}";
+
+        if ($skipCache) {
+            Cache::forget($cacheKey);
+        }
 
         return Cache::remember($cacheKey, $this->cacheDuration, function () use ($propertyId, $params) {
             if (!$this->validateCredentials()) {

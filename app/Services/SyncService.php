@@ -136,8 +136,8 @@ class SyncService
 
             Log::info("Sincronizando propriedade: {$propertyId}");
 
-            // 1. Buscar details da API
-            $detailsResponse = $this->bookervilleService->getPropertyDetails(['propertyId' => $propertyId]);
+            // 1. Buscar details da API (skip cache to ensure fresh rates)
+            $detailsResponse = $this->bookervilleService->getPropertyDetails(['propertyId' => $propertyId, 'skipCache' => true]);
             
             if (!$detailsResponse['success'] || !isset($detailsResponse['data'])) {
                 throw new \Exception("Erro ao buscar details da propriedade {$propertyId}");
@@ -682,6 +682,7 @@ class SyncService
                     'subtitle' => ($details['name'] ?? '') . ($property->property_type ? ' • ' . $property->property_type : ''),
                     'image' => $property->main_image_url ?? $property->main_image,
                     'nightly_rate' => $this->extractNightlyRate($details),
+                    'rates' => $details['rates'] ?? [],
                     'source' => 'bookerville'
                 ];
                 
