@@ -57,5 +57,13 @@ php artisan config:cache --no-interaction 2>&1 || echo "WARNING: Config cache fa
 php artisan route:cache --no-interaction 2>&1 || echo "WARNING: Route cache failed"
 php artisan view:cache --no-interaction 2>&1 || echo "WARNING: View cache failed"
 
+# Background sync: fetch rates from Bookerville API and warm cache
+# Backgrounded so the server starts immediately for Railway health checks
+if [ "$DB_AVAILABLE" = true ]; then
+    echo "=== Starting Bookerville Sync & Cache Warm (background) ==="
+    php artisan cache:clear --no-interaction 2>&1 || true
+    (php artisan bookerville:sync-and-warm --no-interaction 2>&1 || echo "WARNING: Sync failed, falling back to live rate fetching") &
+fi
+
 echo "=== Starting Server on port ${PORT:-8080} ==="
 exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080} --no-interaction
