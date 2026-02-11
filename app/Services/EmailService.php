@@ -52,7 +52,6 @@ class EmailService
                 'message' => 'Email sent successfully!'
             ];
         } catch (Exception $e) {
-            dd($e->getMessage());
             Log::error('Error sending contact email: ' . $e->getMessage(), [
                 'exception' => $e->getTraceAsString()
             ]);

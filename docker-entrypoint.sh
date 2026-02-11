@@ -27,6 +27,11 @@ else
     echo "WARNING: toplist.client_properties.json not found, skipping client property import"
 fi
 
+echo "=== Clearing Stale Caches ==="
+php artisan route:clear --no-interaction 2>&1 || echo "WARNING: Route clear failed"
+php artisan config:clear --no-interaction 2>&1 || echo "WARNING: Config clear failed"
+php artisan view:clear --no-interaction 2>&1 || echo "WARNING: View clear failed"
+
 echo "=== Caching Config ==="
 php artisan config:cache --no-interaction 2>&1 || echo "WARNING: Config cache failed"
 php artisan route:cache --no-interaction 2>&1 || echo "WARNING: Route cache failed"
