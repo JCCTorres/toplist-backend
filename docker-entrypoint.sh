@@ -8,23 +8,43 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
-echo "=== Running Migrations ==="
-php artisan migrate --force --no-interaction 2>&1 || echo "WARNING: Migrations failed, continuing..."
-
-echo "=== Importing Property Data ==="
-# Import properties from JSON files (idempotent - updates if exists)
-if [ -f "toplist.properties.json" ]; then
-    echo "Importing Bookerville properties..."
-    php artisan bookerville:import toplist.properties.json --no-interaction 2>&1 || echo "WARNING: Properties import failed"
+# Quick database connectivity check (5 second timeout)
+echo "=== Checking Database Connectivity ==="
+DB_AVAILABLE=false
+if php -r "
+    \$host = getenv('DB_HOST') ?: '127.0.0.1';
+    \$port = getenv('DB_PORT') ?: '3306';
+    \$timeout = 5;
+    \$sock = @fsockopen(\$host, \$port, \$errno, \$errstr, \$timeout);
+    if (\$sock) { fclose(\$sock); exit(0); } else { exit(1); }
+" 2>/dev/null; then
+    DB_AVAILABLE=true
+    echo "Database is reachable"
 else
-    echo "WARNING: toplist.properties.json not found, skipping property import"
+    echo "WARNING: Database is NOT reachable — skipping migrations and imports"
 fi
 
-if [ -f "toplist.client_properties.json" ]; then
-    echo "Importing client properties..."
-    php artisan client-properties:import toplist.client_properties.json --no-interaction 2>&1 || echo "WARNING: Client properties import failed"
+if [ "$DB_AVAILABLE" = true ]; then
+    echo "=== Running Migrations ==="
+    php artisan migrate --force --no-interaction 2>&1 || echo "WARNING: Migrations failed, continuing..."
+
+    echo "=== Importing Property Data ==="
+    # Import properties from JSON files (idempotent - updates if exists)
+    if [ -f "toplist.properties.json" ]; then
+        echo "Importing Bookerville properties..."
+        php artisan bookerville:import toplist.properties.json --no-interaction 2>&1 || echo "WARNING: Properties import failed"
+    else
+        echo "WARNING: toplist.properties.json not found, skipping property import"
+    fi
+
+    if [ -f "toplist.client_properties.json" ]; then
+        echo "Importing client properties..."
+        php artisan client-properties:import toplist.client_properties.json --no-interaction 2>&1 || echo "WARNING: Client properties import failed"
+    else
+        echo "WARNING: toplist.client_properties.json not found, skipping client property import"
+    fi
 else
-    echo "WARNING: toplist.client_properties.json not found, skipping client property import"
+    echo "=== Skipping Migrations and Imports (no DB) ==="
 fi
 
 echo "=== Clearing Stale Caches ==="
